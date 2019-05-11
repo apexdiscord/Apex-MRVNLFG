@@ -8,7 +8,7 @@ import { Knub, logger } from "knub";
 import { LfgPlugin } from "./plugins/lfg";
 import { WherePlugin } from "./plugins/where";
 import { UtilityPlugin } from "./plugins/utility";
-import { successMessage, errorMessage } from "./utils";
+import { successMessage, errorMessage, startUptimeCount } from "./utils";
 
 const botClient = new Client(`Bot `, {
     getAllUsers: false,
@@ -46,3 +46,4 @@ const bot = new Knub(botClient, {
 
 logger.info("Starting the bot");
 bot.run();
+startUptimeCount();

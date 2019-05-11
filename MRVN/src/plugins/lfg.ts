@@ -1,6 +1,9 @@
-import Knub, { decorators as d, IPluginOptions, getInviteLink, Plugin } from "knub";
-import { Message, VoiceChannel, TextChannel, User, Invite } from "eris";
+import Knub, { decorators as d, IPluginOptions, getInviteLink, Plugin, logger } from "knub";
+import { Message, VoiceChannel, TextChannel, User } from "eris";
 import { isNullOrUndefined } from "util";
+import { performance } from "perf_hooks";
+import { trimLines } from "../utils";
+import { checkForBlockedWords } from "./blocked";
 
 interface ILfgPluginConfig {
     lfg_command_ident: string;
@@ -8,12 +11,14 @@ interface ILfgPluginConfig {
     lfg_text_ident: string;
     lfg_message_compact: boolean;
     lfg_list_others: boolean;
+
+    can_delay: boolean;
 }
 
 export class LfgPlugin extends Plugin<ILfgPluginConfig> {
 
     public static pluginName = "lfg";
-    //private delay: number[];
+    private delay = [9999];
     private current_pos = 0;
 
     getDefaultOptions(): IPluginOptions<ILfgPluginConfig> {
@@ -24,7 +29,16 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
                 lfg_text_ident: "lfg",
                 lfg_message_compact: true,
                 lfg_list_others: true,
+                can_delay: false,
             },
+            overrides: [
+                {
+                    level: ">=50",
+                    config: {
+                        can_delay: true,
+                    },
+                },
+            ],
         };
     }
 
@@ -34,45 +48,62 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
         let cfg = this.getConfig();
         let requestor = msg.member;
         let text = <TextChannel>this.bot.getChannel(msg.channel.id);
+        logger.info(`${requestor.id}: ${requestor.username}#${requestor.discriminator} Started LFG request in ${text.name}`);
+        const start = performance.now();
         if (text.name.toLowerCase().includes(cfg.lfg_text_ident.toLowerCase())) {
 
             //Why this weird german character: "ß"? Because [\s\S] didnt work
             let regex = new RegExp("^" + cfg.lfg_command_ident + "([^ß]|[ß])*$", "i");
             if (!isNullOrUndefined(msg.content.match(regex))) {
 
-                try {
+                if (checkForBlockedWords(msg.cleanContent)) {
 
-                    let voice = <VoiceChannel>this.bot.getChannel(requestor.voiceState.channelID);
-                    regex = new RegExp("^([^ß]|[ß])*" + cfg.lfg_voice_ident + "([^ß]|[ß])*$", "i");
-                    if (!isNullOrUndefined(voice.name.match(regex))) {
+                    try {
 
-                        if (voice.voiceMembers.size >= voice.userLimit) {
+                        let voice = <VoiceChannel>this.bot.getChannel(requestor.voiceState.channelID);
+                        regex = new RegExp("^([^ß]|[ß])*" + cfg.lfg_voice_ident + "([^ß]|[ß])*$", "i");
+                        if (!isNullOrUndefined(voice.name.match(regex))) {
 
-                            let userMessage = msg.content.substring(cfg.lfg_command_ident.length).trim();
-                            regex = new RegExp("`", "g");
-                            userMessage = userMessage.replace(regex, "");
+                            if (voice.voiceMembers.size >= voice.userLimit) {
 
-                            if (userMessage !== "") {
-                                if (cfg.lfg_message_compact) {
-                                    userMessage = "`" + userMessage + "`";
-                                } else {
-                                    userMessage = "```" + userMessage + "```";
+                                let userMessage = msg.content.substring(cfg.lfg_command_ident.length).trim();
+                                regex = new RegExp("`", "g");
+                                userMessage = userMessage.replace(regex, "");
+
+                                if (userMessage !== "") {
+                                    if (cfg.lfg_message_compact) {
+                                        userMessage = "`" + userMessage + "`";
+                                    } else {
+                                        userMessage = "```" + userMessage + "```";
+                                    }
                                 }
+
+                                let toPost = await this.handleMessageCreation(voice, requestor.user, userMessage);
+                                msg.channel.createMessage(toPost);
+
+                                this.delay[this.current_pos] = performance.now() - start;
+                                this.current_pos++;
+                                if (this.current_pos >= 5) {
+                                    this.current_pos = 0;
+                                }
+
+                            } else {
+                                text.createMessage("Sorry, but that voice channel is full! " + requestor.mention);
+                                logger.info(`${requestor.id}: ${requestor.username}#${requestor.discriminator} stopped LFG request: Channel full`);
                             }
 
-                            let toPost = await this.handleMessageCreation(voice, requestor.user, userMessage);
-                            msg.channel.createMessage(toPost);
-
                         } else {
-                            text.createMessage("Sorry, but that voice channel is full! " + requestor.mention);
+                            text.createMessage("Sorry, but you have to be in a lfg voice channel! " + requestor.mention);
+                            logger.info(`${requestor.id}: ${requestor.username}#${requestor.discriminator} stopped LFG request: Not in channel`);
                         }
 
-                    } else {
+                    } catch (error) {
                         text.createMessage("Sorry, but you have to be in a lfg voice channel! " + requestor.mention);
+                        logger.info(`${requestor.id}: ${requestor.username}#${requestor.discriminator} stopped LFG request: Not in channel`);
                     }
 
-                } catch (error) {
-                    text.createMessage("Sorry, but you have to be in a lfg voice channel! " + requestor.mention);
+                } else {
+                    logger.info(`${requestor.id}: ${requestor.username}#${requestor.discriminator} stopped LFG request: triggered word filter`);
                 }
 
                 msg.delete("LFG Request");
@@ -81,6 +112,30 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
 
         }
 
+    }
+
+    @d.command("delay")
+    @d.permission("can_delay")
+    async delayRequest(msg: Message) {
+
+        if (this.delay.length > 1) {
+
+            const highest = Math.round(Math.max(...this.delay));
+            const lowest = Math.round(Math.min(...this.delay));
+            const mean = Math.round(this.delay.reduce((t, v) => t + v, 0) / this.delay.length);
+
+            msg.channel.createMessage(
+                trimLines(`
+      **LFG Delay:**
+      Lowest: **${lowest}ms**
+      Highest: **${highest}ms**
+      Mean: **${mean}ms**
+    `),
+            );
+
+        }
+
+        logger.info(`${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} Requested lfg delays`);
     }
 
     private async handleMessageCreation(vc: VoiceChannel, user: User, message: string) {

@@ -14,3 +14,13 @@ export function trimLines(str: string) {
         .join("\n")
         .trim();
 }
+
+let start = 0;
+
+export function startUptimeCount() {
+    start = Date.now();
+}
+
+export function getUptime() {
+    return Date.now() - start;
+}

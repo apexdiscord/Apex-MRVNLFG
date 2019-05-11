@@ -1,4 +1,4 @@
-import { decorators as d, IPluginOptions, Plugin } from "knub";
+import { decorators as d, IPluginOptions, Plugin, logger } from "knub";
 import { Message, VoiceChannel, TextableChannel, Member, Channel } from "eris";
 import { isNullOrUndefined } from "util";
 import { createInvite } from "./lfg";
@@ -37,7 +37,7 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
     @d.command("where", "<whereId:string>", {
         aliases: ["w"],
     })
-    //@d.permission("can_where")
+    @d.permission("can_where")
     async whereRequest(msg: Message, args: { whereId: string }) {
 
         if (!isNullOrUndefined(args.whereId.match("^[0-9]*$"))) {
@@ -46,12 +46,13 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
             msg.channel.createMessage(msg.author.mention + " please provide a valid userId");
         }
 
+        logger.info(`${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} Requested where for ${args.whereId}`);
     }
 
     @d.command("notify", "<notifyId:string>", {
         aliases: ["n"],
     })
-    //@d.permission("can_notify")
+    @d.permission("can_notify")
     async notifyRequest(msg: Message, args: {notifyId: string}) {
         let cfg = this.getConfig();
 
@@ -66,6 +67,7 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
             msg.channel.createMessage(msg.author.mention + " please provide a valid userId");
         }
 
+        logger.info(`${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} Requested notify for ${args.notifyId}`);
     }
 
     @d.event("voiceChannelJoin")
