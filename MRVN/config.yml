@@ -1,0 +1,12 @@
+# Test Server
+
+prefix: '+'
+
+levels:
+  # Dark
+  "108552944961454080": 100
+
+plugins:
+  where: {}
+  utility: {}
+  lfg: {}
