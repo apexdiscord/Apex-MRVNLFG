@@ -1,7 +1,8 @@
-import { decorators as d, IPluginOptions, Plugin, logger } from "knub";
-import { Message, VoiceChannel, TextableChannel, Member, Channel } from "eris";
+import { decorators as d, IPluginOptions, Plugin, logger, getInviteLink } from "knub";
+import { Message, TextableChannel, Member, Channel, VoiceChannel, Guild, User } from "eris";
 import { isNullOrUndefined } from "util";
 import { createInvite } from "./lfg";
+import { UnknownUser, resolveMember } from "../utils";
 
 interface IWherePluginConfig {
     where_timeout: number;
@@ -13,7 +14,7 @@ interface IWherePluginConfig {
 export class WherePlugin extends Plugin<IWherePluginConfig> {
 
     public static pluginName = "where";
-    private activeNotifications: Array<Notification>;
+    private activeNotifications: Array<Notification> = [];
 
     getDefaultOptions(): IPluginOptions<IWherePluginConfig> {
         return {
@@ -34,40 +35,46 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
         };
     }
 
-    @d.command("where", "<whereId:string>", {
+    @d.command("where", "<user:resolvedUserLoose>", {
         aliases: ["w"],
     })
     @d.permission("can_where")
-    async whereRequest(msg: Message, args: { whereId: string }) {
+    async whereRequest(msg: Message, args: { user: User | UnknownUser }) {
 
-        if (!isNullOrUndefined(args.whereId.match("^[0-9]*$"))) {
-            sendWhere(args.whereId, msg.channel, msg.author.mention + " ");
+        let member;
+        if (!(args.user instanceof UnknownUser)) {
+            member = await resolveMember(this.bot, this.guild, args.user.id);
         } else {
-            msg.channel.createMessage(msg.author.mention + " please provide a valid userId");
+            this.sendErrorMessage(msg.channel, "Unknown user/member!");
         }
 
-        logger.info(`${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} Requested where for ${args.whereId}`);
+        sendWhere(this.guild, member, msg.channel, msg.author.mention + " ");
+
+        logger.info(`${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} Requested where for ${member.id}`);
     }
 
-    @d.command("notify", "<notifyId:string>", {
+    @d.command("notify", "<user:resolvedUserLoose> [time:number]", {
         aliases: ["n"],
     })
     @d.permission("can_notify")
-    async notifyRequest(msg: Message, args: {notifyId: string}) {
-        let cfg = this.getConfig();
+    async notifyRequest(msg: Message, args: { user: User | UnknownUser, time?: number }) {
 
-        if (!isNullOrUndefined(args.notifyId.match("^[0-9]*$"))) {
-
-            this.activeNotifications.push(new Notification(msg.author.id, args.notifyId, msg.channel.id));
-            msg.channel.createMessage("If <@!" + args.notifyId +"> joins or switches VC in the next " + cfg.where_timeout +
-            " seconds, i will notify you");
-            setTimeout(this.removeNotifyforUserId, cfg.where_timeout, args.notifyId);
-
+        let member;
+        if (!(args.user instanceof UnknownUser)) {
+            member = await resolveMember(this.bot, this.guild, args.user.id);
         } else {
-            msg.channel.createMessage(msg.author.mention + " please provide a valid userId");
+            this.sendErrorMessage(msg.channel, "Unknown user/member!");
         }
 
-        logger.info(`${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} Requested notify for ${args.notifyId}`);
+        const cfg = this.getConfig();
+        const timeout = args.time != null ? args.time : cfg.where_timeout;
+
+        const endTime = Date.now() + (timeout * 1000);
+        this.activeNotifications.push(new Notification(msg.author.id, member.id, msg.channel.id, endTime));
+        msg.channel.createMessage("If <@!" + member.id + "> joins or switches VC in the next " + timeout +
+            " seconds, i will notify you");
+
+        logger.info(`${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} Requested notify for ${member.id}`);
     }
 
     @d.event("voiceChannelJoin")
@@ -76,9 +83,14 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
 
         this.activeNotifications.forEach(notif => {
             if (notif.subjectId === member.id) {
-                sendWhere(notif.subjectId, <TextableChannel>this.bot.getChannel(notif.channelId), "<@!" + notif.modId +
-                "> a notification requested by you has triggered:\n");
+
+                if (notif.endTime >= Date.now()) {
+                    sendWhere(this.guild, member, <TextableChannel>this.bot.getChannel(notif.channelId), "<@!" + notif.modId +
+                        "> a notification requested by you has triggered:\n");
+                }
+
                 active = true;
+
             }
         });
 
@@ -90,44 +102,51 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
 
     @d.event("voiceChannelSwitch")
     async userSwitchedVC(member: Member, newChannel: Channel, oldChannel: Channel) {
+        let active = false;
 
         this.activeNotifications.forEach(notif => {
             if (notif.subjectId === member.id) {
-                sendWhere(notif.subjectId, <TextableChannel>this.bot.getChannel(notif.channelId), "<@!" + notif.modId +
-                    "> a notification requested by you has triggered:\n");
+
+                if (notif.endTime >= Date.now()) {
+                    sendWhere(this.guild, member, <TextableChannel>this.bot.getChannel(notif.channelId), "<@!" + notif.modId +
+                        "> a notification requested by you has triggered:\n");
+                }
+
+                active = true;
+
             }
         });
+
+        if (active) {
+            this.removeNotifyforUserId(member.id);
+        }
 
     }
 
     async removeNotifyforUserId(userId: string) {
-        let newNotifies = Array<Notification>();
+        let newNotifies: Array<Notification> = [];
 
-        this.activeNotifications.forEach(notif => {
+        for (let index = 0; index < this.activeNotifications.length; index++) {
+            const notif = this.activeNotifications[index];
             if (notif.subjectId !== userId) {
                 newNotifies.push(notif);
             }
-        });
+        }
 
         this.activeNotifications = newNotifies;
-        
+
     }
 
 }
 
-export async function voiceChannelForUserId(userId: string) {
-    let member = await this.bot.getRESTGuildMember(this.guildId, userId);
-    return <VoiceChannel>this.bot.getChannel(member.voiceState.channelID);
-}
-
-export async function sendWhere(userId: string, channel: TextableChannel, prepend ?: string) {
-    let voice = await voiceChannelForUserId(userId);
+export async function sendWhere(guild: Guild, member: Member, channel: TextableChannel, prepend?: string) {
+    let voice = await <VoiceChannel>guild.channels.get(member.voiceState.channelID);
 
     if (isNullOrUndefined(voice)) {
         channel.createMessage(prepend + "That user is not in a channel");
     } else {
         let invite = await createInvite(voice);
-        channel.createMessage(prepend + "<@!" + userId + "> is in the following channel: " + voice.name + " discord.gg/" + invite.code);
+        channel.createMessage(prepend + "<@!" + member.id + "> is in the following channel: " + voice.name + " https://" + getInviteLink(invite));
     }
 }
 
@@ -135,10 +154,12 @@ class Notification {
     modId: string;
     subjectId: string;
     channelId: string;
+    endTime: number;
 
-    constructor(modId : string, subjectId: string, channelId: string) {
+    constructor(modId: string, subjectId: string, channelId: string, endTime: number) {
         this.modId = modId;
         this.subjectId = subjectId;
         this.channelId = channelId;
+        this.endTime = endTime;
     }
 }

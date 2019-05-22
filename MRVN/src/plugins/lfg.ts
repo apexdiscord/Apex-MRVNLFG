@@ -3,7 +3,7 @@ import { Message, VoiceChannel, TextChannel, User } from "eris";
 import { isNullOrUndefined } from "util";
 import { performance } from "perf_hooks";
 import { trimLines } from "../utils";
-import { checkForBlockedWords } from "./blocked";
+import { passesFilter } from "../blockedWords";
 
 interface ILfgPluginConfig {
     lfg_command_ident: string;
@@ -25,7 +25,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
         return {
             config: {
                 lfg_command_ident: "!lfg",
-                lfg_voice_ident: "team",
+                lfg_voice_ident: "lfg",
                 lfg_text_ident: "lfg",
                 lfg_message_compact: true,
                 lfg_list_others: true,
@@ -48,15 +48,17 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
         let cfg = this.getConfig();
         let requestor = msg.member;
         let text = <TextChannel>this.bot.getChannel(msg.channel.id);
-        logger.info(`${requestor.id}: ${requestor.username}#${requestor.discriminator} Started LFG request in ${text.name}`);
         const start = performance.now();
+
         if (text.name.toLowerCase().includes(cfg.lfg_text_ident.toLowerCase())) {
 
             //Why this weird german character: "ß"? Because [\s\S] didnt work
             let regex = new RegExp("^" + cfg.lfg_command_ident + "([^ß]|[ß])*$", "i");
             if (!isNullOrUndefined(msg.content.match(regex))) {
 
-                if (checkForBlockedWords(msg.cleanContent)) {
+                logger.info(`${requestor.id}: ${requestor.username}#${requestor.discriminator} Started LFG request in ${text.name}`);
+
+                if (passesFilter(msg.cleanContent)) {
 
                     try {
 
@@ -64,7 +66,8 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
                         regex = new RegExp("^([^ß]|[ß])*" + cfg.lfg_voice_ident + "([^ß]|[ß])*$", "i");
                         if (!isNullOrUndefined(voice.name.match(regex))) {
 
-                            if (voice.voiceMembers.size >= voice.userLimit) {
+                            const voiceLimit = voice.userLimit > 0 ? voice.userLimit : 999;
+                            if (voice.voiceMembers.size < voiceLimit) {
 
                                 let userMessage = msg.content.substring(cfg.lfg_command_ident.length).trim();
                                 regex = new RegExp("`", "g");
@@ -80,6 +83,8 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
 
                                 let toPost = await this.handleMessageCreation(voice, requestor.user, userMessage);
                                 msg.channel.createMessage(toPost);
+
+                                logger.info(`${requestor.id}: ${requestor.username}#${requestor.discriminator} Succesfully completed LFG request`);
 
                                 this.delay[this.current_pos] = performance.now() - start;
                                 this.current_pos++;
@@ -169,7 +174,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
                 }
 
                 //channelInfo += " in " + vc.name + ": " + message + " " + getInviteLink(invite);
-                channelInfo += ` in ${vc.name}: ${message} ${getInviteLink(invite)}`;
+                channelInfo += ` in ${vc.name}: ${message} https://${getInviteLink(invite)}`;
 
             } else {
 
@@ -194,7 +199,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
                 }
 
                 //channelInfo += " in " + vc.name + " " + getInviteLink(invite) + "\n" + message;
-                channelInfo += ` in ${vc.name} ${getInviteLink(invite)}\n${message}`;
+                channelInfo += ` in ${vc.name} https://${getInviteLink(invite)}\n${message}`;
 
             }
 

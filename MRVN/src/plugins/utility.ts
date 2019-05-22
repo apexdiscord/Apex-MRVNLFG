@@ -1,7 +1,7 @@
 import { decorators as d, IPluginOptions, Plugin, logger } from "knub";
-import { Message, Member } from "eris";
+import { Message, Member, TextChannel } from "eris";
 import { noop } from "knub/dist/utils";
-import { trimLines, getUptime } from "../utils";
+import { trimLines, getUptime, successMessage } from "../utils";
 import { performance } from "perf_hooks";
 import humanizeDuration from "humanize-duration";
 
@@ -10,6 +10,8 @@ interface IUtilityPluginConfig {
     can_level: boolean;
     can_uptime: boolean;
 }
+
+const activeReloads: Map<string, TextChannel> = new Map();
 
 export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
     public static pluginName = "utility";
@@ -23,10 +25,15 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
             },
             overrides: [
                 {
+                    level: ">=1",
+                    config: {
+                        can_level: true,
+                    },
+                },
+                {
                     level: ">=50",
                     config: {
                         can_ping: true,
-                        can_level: true,
                         can_uptime: true,
                     },
                 },
@@ -73,13 +80,14 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
         logger.info(`${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} Requested bot ping`);
     }
 
-    @d.command("level")
+    @d.command("level", "[member:resolvedMember]")
     @d.permission("can_level")
-    async levelRequest(msg: Message) {
-        const level = this.getMemberLevel(msg.member);
-        msg.channel.createMessage(`The permission level of ${msg.member.username}#${msg.member.discriminator} is **${level}**`);
+    async levelRequest(msg: Message, args: { member?: Member }) {
+        const member = args.member || msg.member;
+        const level = this.getMemberLevel(member);
+        msg.channel.createMessage(`The permission level of ${member.username}#${member.discriminator} is **${level}**`);
 
-        logger.info(`${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} Requested their user level (${level})`);
+        logger.info(`${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} Requested ${member.id}'s user level (${level})`);
     }
 
     @d.command("uptime")
