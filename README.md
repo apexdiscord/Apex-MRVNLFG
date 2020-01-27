@@ -11,4 +11,4 @@ Detailed instructions for setup will follow soon, for now just use
 and use your preferred tools to run the index.js file.
 You will need to put your Bot Token into the bot.env file.
 
-You can contact me in Discord with the username: **Dark#1010** or via the [Apex Legends Discord Server](discord.gg/apexlegends)
+You can contact me in Discord with the username: **Dark#1010** or via the [Apex Legends Discord Server](https://discord.gg/apexlegends)
