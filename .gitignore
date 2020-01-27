@@ -2,3 +2,9 @@
 MRVN/node_modules/
 
 MRVN/dist/
+
+MRVN/bot.env
+
+MRVN/DMMessages.txt
+
+VSCNodeMRVN.code-workspace

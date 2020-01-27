@@ -1,4 +1,4 @@
-import { yaml } from "js-yaml";
+import yaml from "js-yaml";
 import path from "path";
 
 import fs from "fs";
@@ -11,29 +11,35 @@ import { WherePlugin } from "./plugins/where";
 import { UtilityPlugin } from "./plugins/utility";
 import { successMessage, errorMessage, startUptimeCount } from "./utils";
 import { customArgumentTypes } from "./customArgumentTypes";
+import { loadRegex } from "./blockedWords";
 
-const botClient = new Client(`Bot `, {
-    getAllUsers: true,
+require("dotenv").config({ path: path.resolve(process.cwd(), "bot.env") });
+
+const botClient: Client = new Client(`Bot ${process.env.TOKEN }`, {
     restMode: true,
 });
 
-const bot = new Knub(botClient, {
+import moment from "moment-timezone";
+// set TZ to UTC
+moment.tz.setDefault("Etc/UTC");
+
+const bot: Knub = new Knub(botClient, {
     plugins: [UtilityPlugin, LfgPlugin, WherePlugin],
 
     globalPlugins: [],
 
     options: {
-        sendSuccessMessageFn(channel, body) {
+        sendSuccessMessageFn(channel: any, body: any): void {
             channel.createMessage(successMessage(body));
         },
 
-        sendErrorMessageFn(channel, body) {
+        sendErrorMessageFn(channel: any, body: any): void {
             channel.createMessage(errorMessage(body));
         },
 
-        async getConfig(id) {
-            const configFile = id ? `${id}.yml` : "global.yml";
-            const configPath = path.join("config", configFile);
+        async getConfig(id: any): Promise<any> {
+            const configFile: any = id ? `${id}.yml` : "global.yml";
+            const configPath: any = path.join("config", configFile);
 
             try {
                 await fsp.access(configPath);
@@ -41,14 +47,14 @@ const bot = new Knub(botClient, {
                 return {};
             }
 
-            const yamlString = await fsp.readFile(configPath, { encoding: "utf8" });
+            const yamlString: any = await fsp.readFile(configPath, { encoding: "utf8" });
             return yaml.safeLoad(yamlString);
         },
 
         logFn: (level, msg) => {
-            if (level === "debug") return;
             // tslint:disable-next-line
-            console.log(`[${level.toUpperCase()}] ${msg}`);
+            if (level === "debug") return;
+            console.log(`[${level.toUpperCase()}] [${moment().toISOString()}] ${msg}`);
         },
 
         customArgumentTypes,
@@ -58,4 +64,5 @@ const bot = new Knub(botClient, {
 
 logger.info("Starting the bot");
 bot.run();
+loadRegex();
 startUptimeCount();

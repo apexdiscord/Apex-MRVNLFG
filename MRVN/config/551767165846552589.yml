@@ -1,0 +1,25 @@
+# Test Server
+
+prefix: '+'
+
+levels:
+  # Dark
+  "108552944961454080": 100
+  
+  # Moderator
+  "556110793058287637": 50
+
+plugins:
+
+  where: {}
+  utility: {}
+  
+  lfg:
+    config:
+        lfg_command_ident: "!lfg"
+        lfg_voice_ident: "team"
+        lfg_text_ident: "lfg"
+        
+        lfg_enable_ranked: true
+        
+        lfg_enable_shrink: true

@@ -1,9 +1,10 @@
 import Knub, { decorators as d, IPluginOptions, getInviteLink, Plugin, logger } from "knub";
-import { Message, VoiceChannel, TextChannel, User } from "eris";
+import { Message, VoiceChannel, TextChannel, User, Member, Invite } from "eris";
 import { isNullOrUndefined } from "util";
 import { performance } from "perf_hooks";
 import { trimLines } from "../utils";
 import { passesFilter } from "../blockedWords";
+import Eris = require("eris");
 
 interface ILfgPluginConfig {
     lfg_command_ident: string;
@@ -12,13 +13,24 @@ interface ILfgPluginConfig {
     lfg_message_compact: boolean;
     lfg_list_others: boolean;
 
+    lfg_enable_ranked: boolean;
+    lfg_ranked_chan_ident: string;
+    lfg_ranked_emotes_idents: string[];
+    lfg_ranked_emotes_names: string[];
+
+    lfg_enable_shrink: boolean;
+    lfg_shrink_text_idents: string[];
+    lfg_shrink_normal_amt: number;
+    lfg_shrink_shrunk_amt: number;
+    lfg_unshrink_cmd_ident: string;
+
     can_delay: boolean;
 }
 
 export class LfgPlugin extends Plugin<ILfgPluginConfig> {
 
     public static pluginName = "lfg";
-    private delay = [9999];
+    private delay = [];
     private current_pos = 0;
 
     getDefaultOptions(): IPluginOptions<ILfgPluginConfig> {
@@ -29,6 +41,18 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
                 lfg_text_ident: "lfg",
                 lfg_message_compact: true,
                 lfg_list_others: true,
+
+                lfg_enable_ranked: false,
+                lfg_ranked_chan_ident: "ranked",
+                lfg_ranked_emotes_idents: ["examplename1", "examplename2"],
+                lfg_ranked_emotes_names: ["<:test2:671473369891340293>", "<:testEmoji:608348601575407661>"],
+
+                lfg_enable_shrink: false,
+                lfg_shrink_text_idents: ["duo", "1v1"],
+                lfg_shrink_normal_amt: 3,
+                lfg_shrink_shrunk_amt: 2,
+                lfg_unshrink_cmd_ident: "!unshrink",
+
                 can_delay: false,
             },
             overrides: [
@@ -43,53 +67,81 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
     }
 
     @d.event("messageCreate", "guild", true)
-    async lfgRequest(msg: Message) {
+    async lfgRequest(msg: Message): Promise<void> {
 
-        let cfg = this.getConfig();
-        let requestor = msg.member;
-        let text = <TextChannel>this.bot.getChannel(msg.channel.id);
-        const start = performance.now();
+        let cfg: ILfgPluginConfig = this.getConfig();
+        let requestor: Member = msg.member;
+        let text: TextChannel = <TextChannel>this.bot.getChannel(msg.channel.id);
+        const start: any = performance.now();
 
         if (text.name.toLowerCase().includes(cfg.lfg_text_ident.toLowerCase())) {
 
-            //Why this weird german character: "ß"? Because [\s\S] didnt work
-            let regex = new RegExp("^" + cfg.lfg_command_ident + "([^ß]|[ß])*$", "i");
+            // why this weird german character: "ß"? Because [\s\S] didnt work
+            let regex: RegExp = new RegExp("^" + cfg.lfg_command_ident + "([^ß]|[ß])*$", "i");
             if (!isNullOrUndefined(msg.content.match(regex))) {
 
                 logger.info(`${requestor.id}: ${requestor.username}#${requestor.discriminator} Started LFG request in ${text.name}`);
-
                 if (passesFilter(msg.cleanContent)) {
 
                     try {
 
-                        let voice = <VoiceChannel>this.bot.getChannel(requestor.voiceState.channelID);
+                        let voice: VoiceChannel = <VoiceChannel>this.bot.getChannel(requestor.voiceState.channelID);
                         regex = new RegExp("^([^ß]|[ß])*" + cfg.lfg_voice_ident + "([^ß]|[ß])*$", "i");
                         if (!isNullOrUndefined(voice.name.match(regex))) {
 
-                            const voiceLimit = voice.userLimit > 0 ? voice.userLimit : 999;
+                            const voiceLimit: any = voice.userLimit > 0 ? voice.userLimit : 999;
                             if (voice.voiceMembers.size < voiceLimit) {
 
-                                let userMessage = msg.content.substring(cfg.lfg_command_ident.length).trim();
-                                regex = new RegExp("`", "g");
-                                userMessage = userMessage.replace(regex, "");
+                                let userMessage: string = msg.content.substring(cfg.lfg_command_ident.length).trim();
 
-                                if (userMessage !== "") {
-                                    if (cfg.lfg_message_compact) {
-                                        userMessage = "`" + userMessage + "`";
-                                    } else {
-                                        userMessage = "```" + userMessage + "```";
+                                if (userMessage.length <= 275) {
+
+                                    regex = new RegExp("`", "g");
+                                    userMessage = userMessage.replace(regex, "");
+
+                                    if (userMessage !== "") {
+                                        if (cfg.lfg_message_compact) {
+                                            userMessage = "`" + userMessage + "`";
+                                        } else {
+                                            userMessage = "```" + userMessage + "```";
+                                        }
                                     }
-                                }
 
-                                let toPost = await this.handleMessageCreation(voice, requestor.user, userMessage);
-                                msg.channel.createMessage(toPost);
+                                    let ranked: boolean = false;
+                                    if (cfg.lfg_enable_ranked) {
+                                        ranked = text.name.includes(cfg.lfg_ranked_chan_ident);
+                                    }
 
-                                logger.info(`${requestor.id}: ${requestor.username}#${requestor.discriminator} Succesfully completed LFG request`);
+                                    if (cfg.lfg_enable_shrink) {
+                                        let shrink: boolean = false;
+                                        for (let i: any = 0; i < cfg.lfg_shrink_text_idents.length; i++) {
+                                            if (userMessage.includes(cfg.lfg_shrink_text_idents[i])) {
+                                                shrink = true;
+                                                break;
+                                            }
+                                        }
 
-                                this.delay[this.current_pos] = performance.now() - start;
-                                this.current_pos++;
-                                if (this.current_pos >= 5) {
-                                    this.current_pos = 0;
+                                        if (shrink) {
+                                            voice.edit({ userLimit: cfg.lfg_shrink_shrunk_amt });
+                                        } else {
+                                            voice.edit({ userLimit: cfg.lfg_shrink_normal_amt });
+                                        }
+
+                                    }
+
+                                    let toPost: any = await this.handleMessageCreation(voice, requestor.user, userMessage, ranked);
+                                    msg.channel.createMessage(toPost);
+
+                                    logger.info(`${requestor.id}: ${requestor.username}#${requestor.discriminator} Succesfully completed LFG request`);
+
+                                    this.delay[this.current_pos] = performance.now() - start;
+                                    this.current_pos++;
+                                    if (this.current_pos >= 5) {
+                                        this.current_pos = 0;
+                                    }
+                                } else {
+                                    text.createMessage("Sorry, but that message is too long! " + requestor.mention);
+                                    logger.info(`${requestor.id}: ${requestor.username}#${requestor.discriminator} stopped LFG request: Message length = ${userMessage.length}`);
                                 }
 
                             } else {
@@ -104,6 +156,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
 
                     } catch (error) {
                         text.createMessage("Sorry, but you have to be in a lfg voice channel! " + requestor.mention);
+                        // tslint:disable-next-line: max-line-length
                         logger.info(`${requestor.id}: ${requestor.username}#${requestor.discriminator} stopped LFG request: Not in channel`);
                     }
 
@@ -111,7 +164,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
                     logger.info(`${requestor.id}: ${requestor.username}#${requestor.discriminator} stopped LFG request: triggered word filter`);
                 }
 
-                msg.delete("LFG Request");
+                msg.delete("LFG Request").catch();
 
             }
 
@@ -119,15 +172,35 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
 
     }
 
+    @d.event("voiceChannelLeave", "guild", true)
+    async resetChannelLimitLeave(member: Member, vc: VoiceChannel): Promise<any> {
+        let cfg: ILfgPluginConfig = this.getConfig();
+
+        if (cfg.lfg_enable_shrink && vc.voiceMembers.size === 0
+            && vc.userLimit !== cfg.lfg_shrink_normal_amt && vc.name.toLowerCase().includes(cfg.lfg_voice_ident)) {
+            vc.edit({ userLimit: cfg.lfg_shrink_normal_amt });
+        }
+    }
+
+    @d.event("voiceChannelSwitch", "guild", true)
+    async resetChannelLimitSwitch(member: Member, newVC: VoiceChannel, oldVC: VoiceChannel): Promise<any> {
+        let cfg: ILfgPluginConfig = this.getConfig();
+
+        if (cfg.lfg_enable_shrink && oldVC.voiceMembers.size === 0
+            && oldVC.userLimit !== cfg.lfg_shrink_normal_amt && oldVC.name.toLowerCase().includes(cfg.lfg_voice_ident)) {
+            oldVC.edit({ userLimit: cfg.lfg_shrink_normal_amt });
+        }
+    }
+
     @d.command("delay")
     @d.permission("can_delay")
-    async delayRequest(msg: Message) {
+    async delayRequest(msg: Message): Promise<void> {
 
         if (this.delay.length > 1) {
 
-            const highest = Math.round(Math.max(...this.delay));
-            const lowest = Math.round(Math.min(...this.delay));
-            const mean = Math.round(this.delay.reduce((t, v) => t + v, 0) / this.delay.length);
+            const highest: any = Math.round(Math.max(...this.delay));
+            const lowest: any = Math.round(Math.min(...this.delay));
+            const mean: any = Math.round(this.delay.reduce((t, v) => t + v, 0) / this.delay.length);
 
             msg.channel.createMessage(
                 trimLines(`
@@ -138,16 +211,18 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
     `),
             );
 
+        } else {
+            this.sendErrorMessage(msg.channel, "No LFG requests yet, cannot display delays!");
         }
 
         logger.info(`${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} Requested lfg delays`);
     }
 
-    private async handleMessageCreation(vc: VoiceChannel, user: User, message: string) {
+    private async handleMessageCreation(vc: VoiceChannel, user: User, message: string, ranked: boolean): Promise<any> {
 
-        let cfg = this.getConfig();
-        let channelInfo = null;
-        let invite = await createInvite(vc);
+        let cfg: ILfgPluginConfig = this.getConfig();
+        let channelInfo: string = null;
+        let invite: Invite = await createInvite(vc);
 
         if (invite !== null) {
 
@@ -157,12 +232,12 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
 
                 if (cfg.lfg_list_others) {
 
-                    let otherUsers = vc.voiceMembers;
+                    let otherUsers: Eris.Collection<Member> = vc.voiceMembers;
 
                     otherUsers.forEach(vcUser => {
                         if (vcUser.id !== user.id) {
 
-                            let nick = vcUser.nick;
+                            let nick: string = vcUser.nick;
                             if (nick === null) {
                                 nick = vcUser.username;
                             }
@@ -173,8 +248,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
 
                 }
 
-                //channelInfo += " in " + vc.name + ": " + message + " " + getInviteLink(invite);
-                channelInfo += ` in ${vc.name}: ${message} https://${getInviteLink(invite)}`;
+                channelInfo += ` in ${vc.name}: ${message} ${getInviteLink(invite)}`;
 
             } else {
 
@@ -182,12 +256,12 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
 
                 if (cfg.lfg_list_others) {
 
-                    let otherUsers = vc.voiceMembers;
+                    let otherUsers: Eris.Collection<Member> = vc.voiceMembers;
 
                     otherUsers.forEach(vcUser => {
                         if (vcUser.id !== user.id) {
 
-                            let nick = vcUser.nick;
+                            let nick: string = vcUser.nick;
                             if (nick === null) {
                                 nick = vcUser.username;
                             }
@@ -198,11 +272,36 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
 
                 }
 
-                //channelInfo += " in " + vc.name + " " + getInviteLink(invite) + "\n" + message;
-                channelInfo += ` in ${vc.name} https://${getInviteLink(invite)}\n${message}`;
+                channelInfo += ` in ${vc.name} ${getInviteLink(invite)}\n${message}`;
 
             }
 
+        }
+
+        if (ranked && cfg.lfg_enable_ranked) {
+            let rankEmoji: string = "";
+            let firstRank: boolean = true;
+
+            const idents: string[] = cfg.lfg_ranked_emotes_idents;
+            const emotes: string[] = cfg.lfg_ranked_emotes_names;
+
+            for (let i: number = 0; i < idents.length; i++) {
+                if (message.toLowerCase().includes(idents[i])) {
+
+                    if (firstRank) {
+                        firstRank = false;
+                        rankEmoji = "\n** Ranks in this message: **";
+                    }
+
+                    rankEmoji += `${emotes[i]} `;
+                }
+            }
+
+            if (firstRank) {
+                rankEmoji = "\n**No ranks in this message**";
+            }
+
+            channelInfo += rankEmoji;
         }
 
         return channelInfo;
@@ -210,9 +309,9 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
 
 }
 
-export async function createInvite(vc: VoiceChannel) {
+export async function createInvite(vc: VoiceChannel): Promise<Invite> {
 
-    let existingInvites = await vc.getInvites();
+    let existingInvites: Invite[] = await vc.getInvites();
 
     if (existingInvites.length !== 0) {
         return existingInvites[0];

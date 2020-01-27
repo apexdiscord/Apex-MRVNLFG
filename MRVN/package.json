@@ -2,20 +2,33 @@
   "name": "mrvn",
   "version": "1.0.0",
   "description": "NodeJS version of my Java Discord bot MRVNLFG",
+  "private": true,
   "main": "index.js",
+  "scripts": {
+    "start": "npx cross-env NODE_ENV=production TOKEN=YOUR_TOKEN_HERE node dist/index.js",
+    "start-watch": "nodemon",
+    "build": "npx rimraf dist && tsc"
+  },
   "dependencies": {
-    "@types/node": "^12.0.0",
-    "ajv": "^6.10.0",
+    "@types/js-yaml": "^3.12.1",
+    "@types/node": "^12.12.7",
+    "ajv": "^6.10.2",
+    "bufferutil": "^4.0.1",
+    "cross-env": "^6.0.3",
+    "dotenv": "^8.2.0",
     "eris": "github:abalabahaha/eris#dev",
     "https": "^1.0.0",
-    "humanize-duration": "^3.18.0",
+    "humanize-duration": "^3.21.0",
     "js-yaml": "^3.13.1",
-    "knub": "^20.1.0",
-    "ts-node": "^3.3.0"
+    "knub": "^26.1.0",
+    "moment-timezone": "^0.5.27",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.7.2",
+    "utf-8-validate": "^5.0.2"
   },
-  "devDependencies": {},
-  "scripts": {
-    "test": "jest src"
+  "devDependencies": {
+    "nodemon": "^1.19.4",
+    "rimraf": "^3.0.0"
   },
   "repository": {
     "type": "git",
