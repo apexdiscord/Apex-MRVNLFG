@@ -5,7 +5,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "npx cross-env NODE_ENV=production TOKEN=YOUR_TOKEN_HERE node dist/index.js",
+    "start": "npx cross-env NODE_ENV=production node dist/index.js",
     "start-watch": "nodemon",
     "build": "npx rimraf dist && tsc"
   },
