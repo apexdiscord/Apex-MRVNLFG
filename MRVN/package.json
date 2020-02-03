@@ -11,9 +11,9 @@
     "build": "npm run format && npx rimraf dist && tsc"
   },
   "dependencies": {
-    "@types/js-yaml": "^3.12.1",
-    "@types/node": "^12.12.7",
-    "ajv": "^6.10.2",
+    "@types/js-yaml": "^3.12.2",
+    "@types/node": "^12.12.26",
+    "ajv": "^6.11.0",
     "bufferutil": "^4.0.1",
     "cross-env": "^6.0.3",
     "dotenv": "^8.2.0",
@@ -21,16 +21,16 @@
     "https": "^1.0.0",
     "humanize-duration": "^3.21.0",
     "js-yaml": "^3.13.1",
-    "knub": "^26.1.0",
+    "knub": "^26.1.1",
     "moment-timezone": "^0.5.27",
-    "ts-node": "^8.4.1",
-    "typescript": "^3.7.2",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5",
     "utf-8-validate": "^5.0.2"
   },
   "devDependencies": {
     "nodemon": "^1.19.4",
     "prettier": "^1.19.1",
-    "rimraf": "^3.0.0"
+    "rimraf": "^3.0.1"
   },
   "repository": {
     "type": "git",
