@@ -1,0 +1,38 @@
+# Apex Server
+
+prefix: '+'
+
+levels:
+  # Dark
+  "108552944961454080": 100
+  
+  # Admin
+  "542068272007217193": 100
+
+  # Mod
+  "542793364722941972": 50
+
+plugins:
+
+  where: {}
+  utility: {}
+  
+  lfg:
+    config:
+        lfg_command_ident: "!lfg"
+        lfg_voice_ident: "team"
+        lfg_text_ident: "lfg"
+        lfg_message_compact: true
+        lfg_list_others: true
+        
+        lfg_enable_emotes: true
+        lfg_emotes_chan_ident: "ranked"
+        lfg_emotes_idents: ["bronze", "silver", "gold", "plat", "diamond", "predator"]
+        lfg_emotes_names: ["<:bronze:594109269524086794>", "<:silver:594109269805367297>", "<:gold:594109269528412161>", "<:platinum:594109270585507846>", "<:diamond:594109386276995072>", "<:predator:594109270509748224>"]
+        lfg_emotes_found_append: "\n**Ranks in this message: **"
+        lfg_emotes_notfound_append: "\n**No ranks in this message**"
+        
+        lfg_enable_shrink: true
+        lfg_shrink_text_idents: ["duo", "1v1"]
+        lfg_shrink_normal_amt: 3
+        lfg_shrink_shrunk_amt: 2

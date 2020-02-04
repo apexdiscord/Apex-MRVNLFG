@@ -13,16 +13,17 @@ interface ILfgPluginConfig {
   lfg_message_compact: boolean;
   lfg_list_others: boolean;
 
-  lfg_enable_ranked: boolean;
-  lfg_ranked_chan_ident: string;
-  lfg_ranked_emotes_idents: string[];
-  lfg_ranked_emotes_names: string[];
+  lfg_enable_emotes: boolean;
+  lfg_emotes_chan_ident: string;
+  lfg_emotes_idents: string[];
+  lfg_emotes_names: string[];
+  lfg_emotes_found_append: string;
+  lfg_emotes_notfound_append: string;
 
   lfg_enable_shrink: boolean;
   lfg_shrink_text_idents: string[];
   lfg_shrink_normal_amt: number;
   lfg_shrink_shrunk_amt: number;
-  lfg_unshrink_cmd_ident: string;
 
   can_delay: boolean;
 }
@@ -41,16 +42,17 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
         lfg_message_compact: true,
         lfg_list_others: true,
 
-        lfg_enable_ranked: false,
-        lfg_ranked_chan_ident: "ranked",
-        lfg_ranked_emotes_idents: ["examplename1", "examplename2"],
-        lfg_ranked_emotes_names: ["<:test2:671473369891340293>", "<:testEmoji:608348601575407661>"],
+        lfg_enable_emotes: false,
+        lfg_emotes_chan_ident: "ranked",
+        lfg_emotes_idents: ["examplename1", "examplename2"],
+        lfg_emotes_names: ["<:test2:671473369891340293>", "<:testEmoji:608348601575407661>"],
+        lfg_emotes_found_append: "\n**Ranks in this message: **",
+        lfg_emotes_notfound_append: "\n**No ranks in this message**",
 
         lfg_enable_shrink: false,
         lfg_shrink_text_idents: ["duo", "1v1"],
         lfg_shrink_normal_amt: 3,
         lfg_shrink_shrunk_amt: 2,
-        lfg_unshrink_cmd_ident: "!unshrink",
 
         can_delay: false,
       },
@@ -100,9 +102,9 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
                     }
                   }
 
-                  let ranked: boolean = false;
-                  if (cfg.lfg_enable_ranked) {
-                    ranked = text.name.includes(cfg.lfg_ranked_chan_ident);
+                  let emotes: boolean = false;
+                  if (cfg.lfg_enable_emotes) {
+                    emotes = text.name.includes(cfg.lfg_emotes_chan_ident);
                   }
 
                   try {
@@ -130,7 +132,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
                     }
                   }
 
-                  let toPost: any = await this.handleMessageCreation(voice, requestor.user, userMessage, ranked);
+                  let toPost: any = await this.handleMessageCreation(voice, requestor.user, userMessage, emotes);
                   msg.channel.createMessage(toPost);
 
                   logger.info(
@@ -279,26 +281,25 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
       }
     }
 
-    if (ranked && cfg.lfg_enable_ranked) {
+    if (ranked && cfg.lfg_enable_emotes) {
       let rankEmoji: string = "";
       let firstRank: boolean = true;
 
-      const idents: string[] = cfg.lfg_ranked_emotes_idents;
-      const emotes: string[] = cfg.lfg_ranked_emotes_names;
+      const idents: string[] = cfg.lfg_emotes_idents;
+      const emotes: string[] = cfg.lfg_emotes_names;
 
       for (let i: number = 0; i < idents.length; i++) {
         if (message.toLowerCase().includes(idents[i])) {
           if (firstRank) {
             firstRank = false;
-            rankEmoji = "\n** Ranks in this message: **";
+            rankEmoji = cfg.lfg_emotes_found_append;
           }
-
           rankEmoji += `${emotes[i]} `;
         }
       }
 
       if (firstRank) {
-        rankEmoji = "\n**No ranks in this message**";
+        rankEmoji = cfg.lfg_emotes_notfound_append;
       }
 
       channelInfo += rankEmoji;
