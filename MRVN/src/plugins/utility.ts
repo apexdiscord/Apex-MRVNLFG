@@ -11,6 +11,7 @@ interface IUtilityPluginConfig {
   can_ping: boolean;
   can_level: boolean;
   can_uptime: boolean;
+  can_version: boolean;
 
   dm_response: string;
 }
@@ -18,12 +19,15 @@ interface IUtilityPluginConfig {
 export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
   public static pluginName = "utility";
 
+  public static VERSION = "1.0.1";
+
   getDefaultOptions(): IPluginOptions<IUtilityPluginConfig> {
     return {
       config: {
         can_ping: false,
         can_level: false,
         can_uptime: false,
+        can_version: false,
 
         dm_response: "Sorry, but you can only control this bot through commands within the server!",
       },
@@ -39,6 +43,7 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
           config: {
             can_ping: true,
             can_uptime: true,
+            can_version: true,
           },
         },
       ],
@@ -110,6 +115,12 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
     );
 
     logger.info(`${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} Requested bot uptime`);
+  }
+
+  @d.command("version")
+  @d.permission("can_version")
+  async versionRequest(msg: Message): Promise<void> {
+    msg.channel.createMessage(`Current bot version: **${UtilityPlugin.VERSION}**\nLatest release: <https://github.com/DarkView/JS-MRVNLFG/releases>`);
   }
 
   @d.event("messageCreate", "dm", true)
