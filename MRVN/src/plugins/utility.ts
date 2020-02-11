@@ -120,7 +120,9 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
   @d.command("version")
   @d.permission("can_version")
   async versionRequest(msg: Message): Promise<void> {
-    msg.channel.createMessage(`Current bot version: **${UtilityPlugin.VERSION}**\nLatest release: <https://github.com/DarkView/JS-MRVNLFG/releases>`);
+    msg.channel.createMessage(
+      `Current bot version: **${UtilityPlugin.VERSION}**\nLatest release: <https://github.com/DarkView/JS-MRVNLFG/releases>`,
+    );
   }
 
   @d.event("messageCreate", "dm", true)

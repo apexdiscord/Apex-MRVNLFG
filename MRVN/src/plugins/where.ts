@@ -433,7 +433,7 @@ export async function sendWhere(
       return;
     }
     channel.createMessage(
-      `${prepend} <@!${member.id}> is in the following channel: \`${voice.name}\` ${getInviteLink(invite)}`,
+      `${prepend}<@!${member.id}> is in the following channel: \`${voice.name}\` ${getInviteLink(invite)}`,
     );
   }
 }
