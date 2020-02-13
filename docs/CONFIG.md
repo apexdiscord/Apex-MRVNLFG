@@ -150,4 +150,6 @@ plugins:
       - The size voice channels shall be shrunk to if the identifier is found in the message.
       - The default for this option is 2  
       
-**These are all of the plugins and config options currently available**
+**These are all of the plugins and config options currently available**  
+
+If you came here from the [Setup page](https://github.com/DarkView/JS-MRVNLFG/blob/master/docs/SETUP.md#keeping-the-bot-running), you can return there now once you set all of this up the way you want it!
