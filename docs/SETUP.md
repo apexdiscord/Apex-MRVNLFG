@@ -8,5 +8,14 @@
     - NodeJS version 12.4 and 10.16.3 are verified as working.
 4. Get the latest bot version [here](https://github.com/DarkView/JS-MRVNLFG/releases) and extract it. The correct zip follows this namescheme: `NodeMRVN-version.zip`
 5. In the extracted files, copy and rename the `bot.env.example` to `bot.env`. Open it and replace `REPLACE_WITH_YOUR_TOKEN` with your bot token (Not the UserID)
+6. Run `npm ci` in the root directory to install all required packages
 
-After you are done with the above steps, continue to [configuration](https://github.com/DarkView/JS-MRVNLFG/blob/master/docs/CONFIG.md)
+## Configuration  
+After you are done with the above steps, continue to [configuration](https://github.com/DarkView/JS-MRVNLFG/blob/master/docs/CONFIG.md)  
+
+## Keeping the bot running
+Once you have the bot configured the way you want, you need to figure out a way to keep the process running 24/7.  
+On my Linux server i use [forever-service](https://github.com/zapty/forever-service) but you are free to use whatever you want.
+
+## Have you encountered issues? Have any Feedback?
+You can contact me in Discord with the username: **Dark#1010** or via the [Apex Legends Discord Server](https://discord.gg/apexlegends)
