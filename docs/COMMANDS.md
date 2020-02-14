@@ -39,6 +39,7 @@ Jump to a specific command:
 ### Where
 **Plugin:** where  
 **Usage:** `where user`  
+**Alias:** w
 
 Using this command will post an invite to the voice channel the user is currently in.  
 If the user is not in a voice channel, an error will be displayed.
@@ -46,6 +47,7 @@ If the user is not in a voice channel, an error will be displayed.
 ### Follow
 **Plugin:** where  
 **Usage:** `follow user [duration] [-active]`  
+**Alias:** f
 
 Using this command will post an invite to any voice channel the user joins after the command is ran. It will also display a message if they disconnect.  
 Using the `-active` toggle you will be moved to the voice channel the user joined.
@@ -53,18 +55,21 @@ Using the `-active` toggle you will be moved to the voice channel the user joine
 ### Follow Stop
 **Plugin:** where  
 **Usage:** `follow stop user`  
+**Alias:** fs
 
 Using this command will delete all follow requests you have active for the specified user.
 
 ### Notify
 **Plugin:** where  
 **Usage:** `notify user [duration]`  
+**Alias:** n
 
 This is essentially the follow command, but it will only post an invite to the channel once. You can also not use the active tag with this.
 
 ### VCNotify
 **Plugin:** where  
 **Usage:** `notify voiceChannelID [duration]`  
+**Alias:** v, vc, vcn
 
 This command allows you to closely monitor a specific voice channel.  
 You will be notified every time someone joins, leaves or switches to the voice channel.
