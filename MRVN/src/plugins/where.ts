@@ -203,7 +203,7 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
 
   @d.event("voiceChannelJoin")
   async userJoinedVC(member: Member, newChannel: Channel): Promise<void> {
-    let active: boolean = false;
+    let obsolete: boolean = false;
 
     this.activeNotifications.forEach(async notif => {
       if (notif.subjectId === member.id) {
@@ -231,23 +231,23 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
           }
 
           if (!notif.persist) {
-            active = true;
+            obsolete = true;
           }
         } else {
-          active = true;
+          obsolete = true;
         }
       }
     });
 
-    if (active) {
+    if (obsolete) {
       this.removeNotifyforUserId(member.id);
     }
 
-    active = false;
+    obsolete = false;
     this.activeVCNotifications.forEach(notif => {
       if (notif.subjectId === newChannel.id) {
         if (Date.now() >= notif.endTime) {
-          active = true;
+          obsolete = true;
         } else {
           const text: TextableChannel = <TextableChannel>this.bot.getChannel(notif.channelId);
           const voice: VoiceChannel = <VoiceChannel>this.bot.getChannel(notif.subjectId);
@@ -256,14 +256,14 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
       }
     });
 
-    if (active) {
-      this.removeVCNotifyforUserId(member.id);
+    if (obsolete) {
+      this.removeVCNotifyforChannelId(member.id);
     }
   }
 
   @d.event("voiceChannelSwitch")
   async userSwitchedVC(member: Member, newChannel: Channel, oldChannel: Channel): Promise<void> {
-    let active: boolean = false;
+    let obsolete: boolean = false;
     const newVoice: VoiceChannel = <VoiceChannel>this.bot.getChannel(newChannel.id);
     const oldVoice: VoiceChannel = <VoiceChannel>this.bot.getChannel(oldChannel.id);
 
@@ -293,23 +293,23 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
           }
 
           if (!notif.persist) {
-            active = true;
+            obsolete = true;
           }
         } else {
-          active = true;
+          obsolete = true;
         }
       }
     });
 
-    if (active) {
+    if (obsolete) {
       this.removeNotifyforUserId(member.id);
     }
 
-    active = false;
+    obsolete = false;
     this.activeVCNotifications.forEach(notif => {
       if (notif.subjectId === newChannel.id) {
         if (Date.now() >= notif.endTime) {
-          active = true;
+          obsolete = true;
         } else {
           const text: TextableChannel = <TextableChannel>this.bot.getChannel(notif.channelId);
           text.createMessage(
@@ -322,7 +322,7 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
     this.activeVCNotifications.forEach(notif => {
       if (notif.subjectId === oldChannel.id) {
         if (Date.now() >= notif.endTime) {
-          active = true;
+          obsolete = true;
         } else {
           const text: TextableChannel = <TextableChannel>this.bot.getChannel(notif.channelId);
           text.createMessage(
@@ -332,19 +332,19 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
       }
     });
 
-    if (active) {
-      this.removeVCNotifyforUserId(member.id);
+    if (obsolete) {
+      this.removeVCNotifyforChannelId(member.id);
     }
   }
 
   @d.event("voiceChannelLeave")
   async userLeftVC(member: Member, channel: Channel): Promise<void> {
-    let active: boolean = false;
+    let obsolete: boolean = false;
 
     this.activeVCNotifications.forEach(notif => {
       if (notif.subjectId === channel.id) {
         if (Date.now() >= notif.endTime) {
-          active = true;
+          obsolete = true;
         } else {
           const text: TextableChannel = <TextableChannel>this.bot.getChannel(notif.channelId);
           const voice: VoiceChannel = <VoiceChannel>this.bot.getChannel(notif.subjectId);
@@ -355,8 +355,8 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
       }
     });
 
-    if (active) {
-      this.removeVCNotifyforUserId(member.id);
+    if (obsolete) {
+      this.removeVCNotifyforChannelId(member.id);
     }
 
     this.activeNotifications.forEach(async notif => {
@@ -370,14 +370,19 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
             );
           }
         } else {
-          active = true;
+          obsolete = true;
         }
       }
     });
 
-    if (active) {
+    if (obsolete) {
       this.removeNotifyforUserId(member.id);
     }
+  }
+
+  @d.event("guildBanAdd")
+  async onGuildBanAdd(_: any, user: User): Promise<void> {
+    this.removeNotifyforUserId(user.id);
   }
 
   async removeNotifyforUserId(userId: string): Promise<void> {
@@ -393,7 +398,7 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
     this.activeNotifications = newNotifies;
   }
 
-  async removeVCNotifyforUserId(userId: string): Promise<void> {
+  async removeVCNotifyforChannelId(userId: string): Promise<void> {
     let newNotifies: Array<Notification> = [];
 
     for (let index: any = 0; index < this.activeVCNotifications.length; index++) {
