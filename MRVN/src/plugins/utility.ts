@@ -22,7 +22,7 @@ const UPDATE_LOOP_TIME: number = 60 * 60 * 1000;
 export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
   public static pluginName = "utility";
 
-  public static VERSION: string = "1.0.1";
+  public static VERSION: string = "1.0.2";
   public static NEWEST_VERSION: string = UtilityPlugin.VERSION;
   public static NEW_AVAILABLE: boolean = false;
 
@@ -62,14 +62,13 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
   }
 
   async updateLoop(): Promise<void> {
-
     https.get(
       {
         hostname: "api.github.com",
         path: `/repos/DarkView/JS-MRVNLFG/tags`,
         headers: {
-          "User-Agent": `MRVN Bot version ${UtilityPlugin.VERSION} (https://github.com/DarkView/JS-MRVNLFG)`
-        }
+          "User-Agent": `MRVN Bot version ${UtilityPlugin.VERSION} (https://github.com/DarkView/JS-MRVNLFG)`,
+        },
       },
       async res => {
         if (res.statusCode !== 200) {
@@ -78,16 +77,20 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
         }
 
         let data: any = "";
-        res.on("data", chunk => data += chunk);
+        res.on("data", chunk => (data += chunk));
         res.on("end", async () => {
           const parsed: any = JSON.parse(data);
-          if (!Array.isArray(parsed) || parsed.length === 0) { return; }
+          if (!Array.isArray(parsed) || parsed.length === 0) {
+            return;
+          }
 
           UtilityPlugin.NEWEST_VERSION = parsed[0].name;
           UtilityPlugin.NEW_AVAILABLE = await this.compareVersions(UtilityPlugin.NEWEST_VERSION, UtilityPlugin.VERSION);
-          logger.info(`Newest bot version: ${UtilityPlugin.NEWEST_VERSION} | Current bot version: ${UtilityPlugin.VERSION} | New available: ${UtilityPlugin.NEW_AVAILABLE}`);
+          logger.info(
+            `Newest bot version: ${UtilityPlugin.NEWEST_VERSION} | Current bot version: ${UtilityPlugin.VERSION} | New available: ${UtilityPlugin.NEW_AVAILABLE}`,
+          );
         });
-      }
+      },
     );
 
     this.updateTimeout = setTimeout(() => this.updateLoop(), UPDATE_LOOP_TIME);
@@ -100,8 +103,12 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
     for (let i: number = 0; i < Math.max(newerParts.length, olderParts.length); i++) {
       let newerPart: number = parseInt((newerParts[i] || "0").match(/\d+/)[0] || "0", 10);
       let olderPart: number = parseInt((olderParts[i] || "0").match(/\d+/)[0] || "0", 10);
-      if (newerPart > olderPart) { return true; }
-      if (newerPart < olderPart) { return false; }
+      if (newerPart > olderPart) {
+        return true;
+      }
+      if (newerPart < olderPart) {
+        return false;
+      }
     }
 
     return false;
@@ -199,7 +206,7 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
     fs.appendFile(
       "DMMessages.txt",
       `\n${moment().toISOString()} | ${msg.author.id} | ${msg.author.username}#${msg.author.discriminator}: ${
-      msg.cleanContent
+        msg.cleanContent
       }`,
       err => {
         if (err) {
