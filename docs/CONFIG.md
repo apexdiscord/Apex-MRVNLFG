@@ -89,6 +89,9 @@ plugins:
     - where_timeout: int
       - This defines the default amount of time a +f and +n command shall be active for
       - The default for this option is 600000
+	- update_notification: boolean
+	  - This toggles update notifications when using the `where` command on (true) and off (false)
+	  - The default for this option is true
 
 - **utility:**
   - This plugin allows moderators to get the bots Ping to Discord, the delay for the last 5 LFG requests and their level. It also captures all messages sent to the bot in DMs.  

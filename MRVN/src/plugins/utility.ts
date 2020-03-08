@@ -1,11 +1,12 @@
 import { decorators as d, IPluginOptions, Plugin, logger } from "knub";
-import { Message, Member, PrivateChannel } from "eris";
+import { Message, Member, PrivateChannel, NewsChannel, VERSION, TextableChannel } from "eris";
 import { noop } from "knub/dist/utils";
 import { trimLines, getUptime } from "../utils";
 import { performance } from "perf_hooks";
 import humanizeDuration from "humanize-duration";
 import fs from "fs";
 import moment from "moment-timezone";
+import https from "https";
 
 interface IUtilityPluginConfig {
   can_ping: boolean;
@@ -16,10 +17,14 @@ interface IUtilityPluginConfig {
   dm_response: string;
 }
 
+const UPDATE_LOOP_TIME: number = 60 * 60 * 1000;
+
 export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
   public static pluginName = "utility";
 
-  public static VERSION = "1.0.1";
+  public static VERSION: string = "1.0.1";
+  public static NEWEST_VERSION: string = UtilityPlugin.VERSION;
+  public static NEW_AVAILABLE: boolean = false;
 
   getDefaultOptions(): IPluginOptions<IUtilityPluginConfig> {
     return {
@@ -48,6 +53,58 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
         },
       ],
     };
+  }
+
+  private updateTimeout;
+
+  onLoad(): void {
+    this.updateLoop();
+  }
+
+  async updateLoop(): Promise<void> {
+
+    https.get(
+      {
+        hostname: "api.github.com",
+        path: `/repos/DarkView/JS-MRVNLFG/tags`,
+        headers: {
+          "User-Agent": `MRVN Bot version ${UtilityPlugin.VERSION} (https://github.com/DarkView/JS-MRVNLFG)`
+        }
+      },
+      async res => {
+        if (res.statusCode !== 200) {
+          logger.warn(`[WARN] Got status code ${res.statusCode} when checking for available updates`);
+          return;
+        }
+
+        let data: any = "";
+        res.on("data", chunk => data += chunk);
+        res.on("end", async () => {
+          const parsed: any = JSON.parse(data);
+          if (!Array.isArray(parsed) || parsed.length === 0) { return; }
+
+          UtilityPlugin.NEWEST_VERSION = parsed[0].name;
+          UtilityPlugin.NEW_AVAILABLE = await this.compareVersions(UtilityPlugin.NEWEST_VERSION, UtilityPlugin.VERSION);
+          logger.info(`Newest bot version: ${UtilityPlugin.NEWEST_VERSION} | Current bot version: ${UtilityPlugin.VERSION} | New available: ${UtilityPlugin.NEW_AVAILABLE}`);
+        });
+      }
+    );
+
+    this.updateTimeout = setTimeout(() => this.updateLoop(), UPDATE_LOOP_TIME);
+  }
+
+  async compareVersions(newer: string, older: string): Promise<boolean> {
+    const newerParts: string[] = newer.split(".");
+    const olderParts: string[] = older.split(".");
+
+    for (let i: number = 0; i < Math.max(newerParts.length, olderParts.length); i++) {
+      let newerPart: number = parseInt((newerParts[i] || "0").match(/\d+/)[0] || "0", 10);
+      let olderPart: number = parseInt((olderParts[i] || "0").match(/\d+/)[0] || "0", 10);
+      if (newerPart > olderPart) { return true; }
+      if (newerPart < olderPart) { return false; }
+    }
+
+    return false;
   }
 
   @d.command("ping")
@@ -120,9 +177,15 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
   @d.command("version")
   @d.permission("can_version")
   async versionRequest(msg: Message): Promise<void> {
-    msg.channel.createMessage(
-      `Current bot version: **${UtilityPlugin.VERSION}**\nLatest release: <https://github.com/DarkView/JS-MRVNLFG/releases>`,
-    );
+    let reply: string;
+
+    if (UtilityPlugin.NEW_AVAILABLE) {
+      reply = `New bot version available!\nCurrent bot version: **${UtilityPlugin.VERSION}**\nLatest version: **${UtilityPlugin.NEWEST_VERSION}**`;
+    } else {
+      reply = `You have the newest bot version! Version: **${UtilityPlugin.VERSION}**`;
+    }
+
+    msg.channel.createMessage(reply);
   }
 
   @d.event("messageCreate", "dm", true)
@@ -136,7 +199,7 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
     fs.appendFile(
       "DMMessages.txt",
       `\n${moment().toISOString()} | ${msg.author.id} | ${msg.author.username}#${msg.author.discriminator}: ${
-        msg.cleanContent
+      msg.cleanContent
       }`,
       err => {
         if (err) {

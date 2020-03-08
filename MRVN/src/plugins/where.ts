@@ -4,9 +4,11 @@ import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
 import { createInvite } from "./lfg";
 import { UnknownUser, resolveMember, errorMessage, successMessage } from "../utils";
+import { UtilityPlugin } from "./utility";
 
 interface IWherePluginConfig {
   where_timeout: number;
+  update_notification: boolean;
 
   can_where: boolean;
   can_notify: boolean;
@@ -47,6 +49,8 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
     return {
       config: {
         where_timeout: 600000,
+        update_notification: true,
+
         can_where: false,
         can_notify: false,
         can_follow: false,
@@ -81,7 +85,13 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
       this.sendErrorMessage(msg.channel, "Unknown user/member! Is the ID correct?");
       return;
     }
-    sendWhere(this.guild, member, msg.channel, msg.author.mention + " ");
+
+    let newVer: string = "";
+    if (UtilityPlugin.NEW_AVAILABLE && this.getConfig().update_notification) {
+      newVer = `⚙️ New bot version available! Version **${UtilityPlugin.NEWEST_VERSION}**\n`;
+    }
+
+    sendWhere(this.guild, member, msg.channel, newVer + msg.author.mention + " ");
 
     logger.info(
       `${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} Requested where for ${member.id}`,
