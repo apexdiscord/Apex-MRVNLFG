@@ -26,4 +26,4 @@ Once you have the bot configured the way you want, you need to figure out a way 
 On my Linux server i use [forever-service](https://github.com/zapty/forever-service) but you are free to use whatever you want.
 
 ## Have you encountered issues? Have any Feedback?
-You can contact me in Discord with the username: **Dark#1010** or via the [Apex Legends Discord Server](https://discord.gg/apexlegends)
+You can contact me in Discord with the username: **Dark#1010** (though i delete all random friend requests) or via the [Apex Legends Discord Server](https://discord.gg/apexlegends)
