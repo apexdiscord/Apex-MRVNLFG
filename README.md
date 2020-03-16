@@ -14,5 +14,6 @@ Moderators also benefit from the [commands](https://github.com/DarkView/JS-MRVNL
 - [Setup <img src="https://raw.githubusercontent.com/DarkView/JS-MRVNLFG/master/docs/MRVN.png" height="16">](https://github.com/DarkView/JS-MRVNLFG/blob/master/docs/SETUP.md)
 - [Config ⚙️](https://github.com/DarkView/JS-MRVNLFG/blob/master/docs/CONFIG.md)
 - [Commands 🔊](https://github.com/DarkView/JS-MRVNLFG/blob/master/docs/COMMANDS.md)
+- [Examples 📷](https://github.com/DarkView/JS-MRVNLFG/blob/master/docs/EXAMPLES.md)
 
 You can contact me in Discord with the username: **Dark#1010** (though i delete all random friend requests) or via the [Apex Legends Discord Server](https://discord.gg/apexlegends)
