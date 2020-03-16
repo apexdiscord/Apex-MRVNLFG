@@ -105,3 +105,7 @@ Displays the current bot version along with a link to the [releases page](https:
 **Usage:** `level [user]`  
 
 Displays the level of the specified user. 
+
+# Suggestions
+If you have any change you would like to see or a command added, do not hesitate to contact me!  
+You can contact me in Discord with the username: **Dark#1010** (though i delete all random friend requests) or via the [Apex Legends Discord Server](https://discord.gg/apexlegends)
