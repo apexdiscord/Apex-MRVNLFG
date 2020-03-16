@@ -15,4 +15,4 @@ Moderators also benefit from the [commands](https://github.com/DarkView/JS-MRVNL
 - [Config ⚙️](https://github.com/DarkView/JS-MRVNLFG/blob/master/docs/CONFIG.md)
 - [Commands 🔊](https://github.com/DarkView/JS-MRVNLFG/blob/master/docs/COMMANDS.md)
 
-You can contact me in Discord with the username: **Dark#1010** or via the [Apex Legends Discord Server](https://discord.gg/apexlegends)
+You can contact me in Discord with the username: **Dark#1010** (though i delete all random friend requests) or via the [Apex Legends Discord Server](https://discord.gg/apexlegends)
