@@ -1,5 +1,6 @@
 # Commands 🔊
-Besides the LFG commands available to all users, this bot features a few different commands that are usefull for moderators
+Besides the LFG commands available to all users, this bot features a few different commands that are usefull for moderators.
+You can find examples of these commands here: [Examples 📷](https://github.com/DarkView/JS-MRVNLFG/blob/master/docs/EXAMPLES.md)
 
 ## Definitions
  - **user**
