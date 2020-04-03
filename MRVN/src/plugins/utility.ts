@@ -22,7 +22,7 @@ const UPDATE_LOOP_TIME: number = 60 * 60 * 1000;
 export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
   public static pluginName = "utility";
 
-  public static VERSION: string = "1.0.2";
+  public static VERSION: string = "1.0.3";
   public static NEWEST_VERSION: string = UtilityPlugin.VERSION;
   public static NEW_AVAILABLE: boolean = false;
 
