@@ -79,7 +79,7 @@ You will be notified every time someone joins, leaves or switches to the voice c
 ## General
 
 ### Voice Usage
-**Plugin**: where
+**Plugin**: where  
 **Usage:** `voice_usage`
 
 Displays the amount of voice channels in use at the current time for each category
