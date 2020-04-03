@@ -22,7 +22,7 @@ const UPDATE_LOOP_TIME: number = 60 * 60 * 1000;
 export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
   public static pluginName = "utility";
 
-  public static VERSION: string = "1.0.3";
+  public static VERSION: string = "1.0.4";
   public static NEWEST_VERSION: string = UtilityPlugin.VERSION;
   public static NEW_AVAILABLE: boolean = false;
 
@@ -114,6 +114,7 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
     return false;
   }
 
+  @d.cooldown(10 * 1000)
   @d.command("ping")
   @d.permission("can_ping")
   async pingRequest(msg: Message): Promise<any> {
@@ -168,6 +169,7 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
     );
   }
 
+  @d.cooldown(5 * 1000)
   @d.command("uptime")
   @d.permission("can_uptime")
   async uptimeRequest(msg: Message): Promise<any> {
@@ -181,6 +183,7 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
     logger.info(`${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} Requested bot uptime`);
   }
 
+  @d.cooldown(5 * 1000)
   @d.command("version")
   @d.permission("can_version")
   async versionRequest(msg: Message): Promise<void> {

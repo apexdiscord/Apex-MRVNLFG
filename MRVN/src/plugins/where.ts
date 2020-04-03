@@ -1,5 +1,17 @@
 import { decorators as d, IPluginOptions, Plugin, logger, getInviteLink } from "knub";
-import { Message, TextableChannel, Member, Channel, VoiceChannel, Guild, User, Invite } from "eris";
+import {
+  Message,
+  TextableChannel,
+  Member,
+  Channel,
+  VoiceChannel,
+  Guild,
+  User,
+  Invite,
+  AnyGuildChannel,
+  Collection,
+  CategoryChannel,
+} from "eris";
 import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
 import { createInvite } from "./lfg";
@@ -13,6 +25,7 @@ interface IWherePluginConfig {
   can_where: boolean;
   can_notify: boolean;
   can_follow: boolean;
+  can_usage: boolean;
 }
 
 class Notification {
@@ -40,6 +53,12 @@ class Notification {
   }
 }
 
+enum ChannelType {
+  TextChannel = 0,
+  VoiceChannel = 2,
+  Category = 4,
+}
+
 export class WherePlugin extends Plugin<IWherePluginConfig> {
   public static pluginName = "where";
   private activeNotifications: Array<Notification> = [];
@@ -54,6 +73,7 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
         can_where: false,
         can_notify: false,
         can_follow: false,
+        can_usage: false,
       },
       overrides: [
         {
@@ -62,6 +82,7 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
             can_where: true,
             can_notify: true,
             can_follow: true,
+            can_usage: true,
           },
         },
       ],
@@ -209,6 +230,52 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
     logger.info(
       `${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} Requested notify/follow deletion for ${args.user.id}`,
     );
+  }
+
+  @d.cooldown(30 * 1000)
+  @d.command("voice_usage", "", {
+    aliases: ["voiceusage", "vu"],
+  })
+  @d.permission("can_usage")
+  async voiceUsageRequest(msg: Message): Promise<void> {
+    const channels: Collection<AnyGuildChannel> = this.guild.channels;
+    const channelMap: Map<AnyGuildChannel, string> = new Map();
+    const categories: AnyGuildChannel[] = [];
+
+    channels.forEach(ch => {
+      if (ChannelType[ch.type] === "VoiceChannel") {
+        channelMap.set(ch, ch.parentID);
+      } else if (ChannelType[ch.type] === "Category") {
+        categories.push(ch);
+      }
+    });
+    const col: Intl.Collator = new Intl.Collator(undefined, { numeric: true, sensitivity: `base` });
+    categories.sort((a, b) => col.compare(a.name, b.name));
+
+    let reply: string = "Channel usage:";
+
+    for (const cat of categories) {
+      const catChannels: AnyGuildChannel[] = [...channelMap.entries()]
+        .filter(({ 1: id }) => id === cat.id)
+        .map(([k]) => k);
+      if (catChannels.length === 0) {
+        continue;
+      }
+
+      let freeAmt: number = 0;
+      catChannels.forEach(ch => {
+        const vc: VoiceChannel = this.bot.getChannel(ch.id) as VoiceChannel;
+        if (vc.voiceMembers.size === 0) {
+          freeAmt++;
+        }
+      });
+
+      reply += `\n__${cat.name}__: **${freeAmt}** of **${catChannels.length}** free`;
+    }
+
+    msg.channel.createMessage(reply);
+
+    logger.info(`${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} Requested current VC usage`);
   }
 
   @d.event("voiceChannelJoin")

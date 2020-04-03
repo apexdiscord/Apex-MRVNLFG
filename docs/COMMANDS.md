@@ -29,6 +29,7 @@ Jump to a specific command:
 - [follow stop / fs](#follow-stop)
 - [notify / n](#notify)
 - [vcnotify / v](#vcnotify)
+- [voice_usage / vu](#voice-usage)
 - [delay](#delay)
 - [ping](#ping)
 - [uptime](#uptime)
@@ -76,6 +77,12 @@ This command allows you to closely monitor a specific voice channel.
 You will be notified every time someone joins, leaves or switches to the voice channel.
 
 ## General
+
+### Voice Usage
+**Plugin**: where
+**Usage:** `voice_usage`
+
+Displays the amount of voice channels in use at the current time for each category
 
 ### Delay
 **Plugin:** lfg  
