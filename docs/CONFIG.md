@@ -47,6 +47,7 @@ plugins:
   lfg:
     config:
         lfg_command_ident: "!lfg"
+		lfg_unshrink_ident: "!unshrink"
         lfg_voice_ident: "team"
         lfg_text_ident: "lfg"
         lfg_message_compact: true
@@ -108,6 +109,9 @@ plugins:
     - lfg_command_ident: "string"
       - The string that needs to be at the front of lfg messages. Only messages with this identifier at the beginning will trigger lfg requests. It is important to include the prefix you want the command to have!
       - The default for this option is "!lfg"
+	- lfg_unshrink_ident: "string"
+	  - The string that needs to be used to unshrink the channel the user is in
+	  - The default for this option is "!unshrink"
     - lfg_voice_ident: "string"
       - The string that needs to be included in the users voice channel for the LFG request to be permitted. For example, all LFG voice channels on Apex follow the scheme: `[Region] Team #`, thus the identifier is team.
       - The default for this option is "lfg"
@@ -146,12 +150,13 @@ plugins:
     - lfg_shrink_text_idents: ["string", ...]
       - This defines the identifier that needs to be included in the request message for the voice channel to be shrunk
       - The default for this option is ["duo", "1v1"]
+    - lfg_shrink_shrunk_amts: [int, ...]
+      - The size voice channels shall be shrunk to if the identifier at the same array position is found in the message.
+      - The default for this option is [2, 2]
+	  - **Important**: This changed with version 1.0.3, being both renamed and changed to an array
     - lfg_shrink_normal_amt: int
       - The default size voice channels usually have. Needed to resize the channels back to normal once everyone left
-      - The default for this option is 3
-    - lfg_shrink_shrunk_amt: int
-      - The size voice channels shall be shrunk to if the identifier is found in the message.
-      - The default for this option is 2  
+      - The default for this option is 3 
       
 **These are all of the plugins and config options currently available**  
 

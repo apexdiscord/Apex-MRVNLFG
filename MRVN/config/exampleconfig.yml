@@ -20,6 +20,7 @@ plugins:
   lfg:
     config:
         lfg_command_ident: "!lfg"
+        lfg_unshrink_ident: "!unshrink"
         lfg_voice_ident: "team"
         lfg_text_ident: "lfg"
         lfg_message_compact: true
