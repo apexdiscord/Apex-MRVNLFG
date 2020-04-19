@@ -339,7 +339,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
     if (cfg.lfg_enable_shrink) {
       let shrink: number;
       for (let i: any = 0; i < cfg.lfg_shrink_text_idents.length; i++) {
-        if (userMessage.includes(cfg.lfg_shrink_text_idents[i])) {
+        if (userMessage.toLowerCase().includes(cfg.lfg_shrink_text_idents[i])) {
           shrink = cfg.lfg_shrink_shrunk_amts[i];
           break;
         }
