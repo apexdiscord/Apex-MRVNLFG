@@ -1,21 +1,20 @@
-import { decorators as d, IPluginOptions, Plugin, logger, getInviteLink } from "knub";
 import {
+  AnyGuildChannel,
+  Channel,
+  Collection,
+  Guild,
+  Invite,
+  Member,
   Message,
   TextableChannel,
-  Member,
-  Channel,
-  VoiceChannel,
-  Guild,
   User,
-  Invite,
-  AnyGuildChannel,
-  Collection,
-  CategoryChannel,
+  VoiceChannel,
 } from "eris";
 import humanizeDuration from "humanize-duration";
+import { decorators as d, getInviteLink, IPluginOptions, logger, Plugin } from "knub";
 import moment from "moment-timezone";
+import { errorMessage, resolveMember, successMessage, UnknownUser } from "../utils";
 import { createInvite } from "./lfg";
-import { UnknownUser, resolveMember, errorMessage, successMessage } from "../utils";
 import { UtilityPlugin } from "./utility";
 
 interface IWherePluginConfig {
@@ -61,8 +60,8 @@ enum ChannelType {
 
 export class WherePlugin extends Plugin<IWherePluginConfig> {
   public static pluginName = "where";
-  private activeNotifications: Array<Notification> = [];
-  private activeVCNotifications: Array<Notification> = [];
+  private activeNotifications: Notification[] = [];
+  private activeVCNotifications: Notification[] = [];
 
   getDefaultOptions(): IPluginOptions<IWherePluginConfig> {
     return {
@@ -100,6 +99,7 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
       try {
         member = await this.bot.getRESTGuildMember(this.guildId, args.user.id);
       } catch (err) {
+        // tslint:disable-next-line: no-console
         console.error(err);
       }
     } else {
@@ -133,7 +133,7 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
     }
 
     const cfg: IWherePluginConfig = this.getConfig();
-    let timeout: any = args.time != null ? args.time : cfg.where_timeout;
+    const timeout: any = args.time != null ? args.time : cfg.where_timeout;
 
     const endTime: any = moment().add(timeout, "ms");
     this.activeNotifications.push(new Notification(msg.author.id, member.id, msg.channel.id, endTime, false, false));
@@ -154,7 +154,7 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
     const cfg: IWherePluginConfig = this.getConfig();
     const timeout: any = args.time != null ? args.time : cfg.where_timeout;
 
-    const channel: VoiceChannel = <VoiceChannel>this.bot.getChannel(args.channelId);
+    const channel: VoiceChannel = this.bot.getChannel(args.channelId) as VoiceChannel;
     if (channel == null) {
       this.sendErrorMessage(msg.channel, "Couldnt find channel");
       return;
@@ -242,7 +242,7 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
     const channelMap: Map<AnyGuildChannel, string> = new Map();
     const categories: AnyGuildChannel[] = [];
 
-    channels.forEach(ch => {
+    channels.forEach((ch) => {
       if (ChannelType[ch.type] === "VoiceChannel") {
         channelMap.set(ch, ch.parentID);
       } else if (ChannelType[ch.type] === "Category") {
@@ -263,7 +263,7 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
       }
 
       let freeAmt: number = 0;
-      catChannels.forEach(ch => {
+      catChannels.forEach((ch) => {
         const vc: VoiceChannel = this.bot.getChannel(ch.id) as VoiceChannel;
         if (vc.voiceMembers.size === 0) {
           freeAmt++;
@@ -282,10 +282,10 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
   async userJoinedVC(member: Member, newChannel: Channel): Promise<void> {
     let obsolete: boolean = false;
 
-    this.activeNotifications.forEach(async notif => {
+    this.activeNotifications.forEach(async (notif) => {
       if (notif.subjectId === member.id) {
         if (notif.endTime >= Date.now()) {
-          const channel: TextableChannel = <TextableChannel>this.bot.getChannel(notif.channelId);
+          const channel: TextableChannel = this.bot.getChannel(notif.channelId) as TextableChannel;
           sendWhere(
             this.guild,
             member,
@@ -321,13 +321,13 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
     }
 
     obsolete = false;
-    this.activeVCNotifications.forEach(notif => {
+    this.activeVCNotifications.forEach((notif) => {
       if (notif.subjectId === newChannel.id) {
         if (Date.now() >= notif.endTime) {
           obsolete = true;
         } else {
-          const text: TextableChannel = <TextableChannel>this.bot.getChannel(notif.channelId);
-          const voice: VoiceChannel = <VoiceChannel>this.bot.getChannel(notif.subjectId);
+          const text: TextableChannel = this.bot.getChannel(notif.channelId) as TextableChannel;
+          const voice: VoiceChannel = this.bot.getChannel(notif.subjectId) as VoiceChannel;
           text.createMessage(`🔵 <@!${notif.modId}> The user <@!${member.id}> joined the channel \`${voice.name}\``);
         }
       }
@@ -340,14 +340,14 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
 
   @d.event("voiceChannelSwitch")
   async userSwitchedVC(member: Member, newChannel: Channel, oldChannel: Channel): Promise<void> {
-    let obsolete: boolean = false;
-    const newVoice: VoiceChannel = <VoiceChannel>this.bot.getChannel(newChannel.id);
-    const oldVoice: VoiceChannel = <VoiceChannel>this.bot.getChannel(oldChannel.id);
+    let obsolete = false;
+    const newVoice = this.bot.getChannel(newChannel.id) as VoiceChannel;
+    const oldVoice = this.bot.getChannel(oldChannel.id) as VoiceChannel;
 
-    this.activeNotifications.forEach(async notif => {
+    this.activeNotifications.forEach(async (notif) => {
       if (notif.subjectId === member.id) {
         if (notif.endTime >= Date.now()) {
-          const channel: TextableChannel = <TextableChannel>this.bot.getChannel(notif.channelId);
+          const channel = this.bot.getChannel(notif.channelId) as TextableChannel;
           sendWhere(
             this.guild,
             member,
@@ -383,12 +383,12 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
     }
 
     obsolete = false;
-    this.activeVCNotifications.forEach(notif => {
+    this.activeVCNotifications.forEach((notif) => {
       if (notif.subjectId === newChannel.id) {
         if (Date.now() >= notif.endTime) {
           obsolete = true;
         } else {
-          const text: TextableChannel = <TextableChannel>this.bot.getChannel(notif.channelId);
+          const text = this.bot.getChannel(notif.channelId) as TextableChannel;
           text.createMessage(
             `🔵 <@!${notif.modId}> The user <@!${member.id}> switched to the channel \`${newVoice.name}\` from \`${oldVoice.name}\``,
           );
@@ -396,12 +396,12 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
       }
     });
 
-    this.activeVCNotifications.forEach(notif => {
+    this.activeVCNotifications.forEach((notif) => {
       if (notif.subjectId === oldChannel.id) {
         if (Date.now() >= notif.endTime) {
           obsolete = true;
         } else {
-          const text: TextableChannel = <TextableChannel>this.bot.getChannel(notif.channelId);
+          const text = this.bot.getChannel(notif.channelId) as TextableChannel;
           text.createMessage(
             `🔴 <@!${notif.modId}> The user <@!${member.id}> switched out of the channel \`${oldVoice.name}\` and joined \`${newVoice.name}\``,
           );
@@ -418,13 +418,13 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
   async userLeftVC(member: Member, channel: Channel): Promise<void> {
     let obsolete: boolean = false;
 
-    this.activeVCNotifications.forEach(notif => {
+    this.activeVCNotifications.forEach((notif) => {
       if (notif.subjectId === channel.id) {
         if (Date.now() >= notif.endTime) {
           obsolete = true;
         } else {
-          const text: TextableChannel = <TextableChannel>this.bot.getChannel(notif.channelId);
-          const voice: VoiceChannel = <VoiceChannel>this.bot.getChannel(notif.subjectId);
+          const text = this.bot.getChannel(notif.channelId) as TextableChannel;
+          const voice = this.bot.getChannel(notif.subjectId) as VoiceChannel;
           text.createMessage(
             `🔴 <@!${notif.modId}> The user <@!${member.id}> disconnected out of the channel \`${voice.name}\``,
           );
@@ -436,12 +436,12 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
       this.removeVCNotifyforChannelId(member.id);
     }
 
-    this.activeNotifications.forEach(async notif => {
+    this.activeNotifications.forEach(async (notif) => {
       if (notif.subjectId === member.id) {
         if (notif.endTime >= Date.now()) {
           if (notif.persist) {
-            const tchannel: TextableChannel = <TextableChannel>this.bot.getChannel(notif.channelId);
-            const voice: VoiceChannel = <VoiceChannel>this.bot.getChannel(channel.id);
+            const tchannel = this.bot.getChannel(notif.channelId) as TextableChannel;
+            const voice = this.bot.getChannel(channel.id) as VoiceChannel;
             tchannel.createMessage(
               `<@!${notif.modId}> The user <@!${member.id}> disconnected out of the channel \`${voice.name}\``,
             );
@@ -463,10 +463,9 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
   }
 
   async removeNotifyforUserId(userId: string): Promise<void> {
-    let newNotifies: Array<Notification> = [];
+    const newNotifies: Notification[] = [];
 
-    for (let index: any = 0; index < this.activeNotifications.length; index++) {
-      const notif: Notification = this.activeNotifications[index];
+    for (const notif of this.activeNotifications) {
       if (notif.subjectId !== userId) {
         newNotifies.push(notif);
       }
@@ -476,10 +475,9 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
   }
 
   async removeVCNotifyforChannelId(userId: string): Promise<void> {
-    let newNotifies: Array<Notification> = [];
+    const newNotifies: Notification[] = [];
 
-    for (let index: any = 0; index < this.activeVCNotifications.length; index++) {
-      const notif: Notification = this.activeVCNotifications[index];
+    for (const notif of this.activeVCNotifications) {
       if (notif.subjectId !== userId) {
         newNotifies.push(notif);
       }
@@ -497,7 +495,7 @@ export async function sendWhere(
 ): Promise<void> {
   let voice: VoiceChannel = null;
   try {
-    voice = <VoiceChannel>guild.channels.get(member.voiceState.channelID);
+    voice = guild.channels.get(member.voiceState.channelID) as VoiceChannel;
   } catch (e) {
     channel.createMessage(errorMessage("Could not retrieve information on that user!\nAre they on the server?"));
     return;

@@ -1,12 +1,12 @@
-import { decorators as d, IPluginOptions, Plugin, logger } from "knub";
-import { Message, Member, PrivateChannel, NewsChannel, VERSION, TextableChannel } from "eris";
-import { noop } from "knub/dist/utils";
-import { trimLines, getUptime } from "../utils";
-import { performance } from "perf_hooks";
-import humanizeDuration from "humanize-duration";
+import { Member, Message } from "eris";
 import fs from "fs";
-import moment from "moment-timezone";
 import https from "https";
+import humanizeDuration from "humanize-duration";
+import { decorators as d, IPluginOptions, logger, Plugin } from "knub";
+import { noop } from "knub/dist/utils";
+import moment from "moment-timezone";
+import { performance } from "perf_hooks";
+import { getUptime, trimLines } from "../utils";
 
 interface IUtilityPluginConfig {
   can_ping: boolean;
@@ -70,14 +70,14 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
           "User-Agent": `MRVN Bot version ${UtilityPlugin.VERSION} (https://github.com/DarkView/JS-MRVNLFG)`,
         },
       },
-      async res => {
+      async (res) => {
         if (res.statusCode !== 200) {
           logger.warn(`[WARN] Got status code ${res.statusCode} when checking for available updates`);
           return;
         }
 
         let data: any = "";
-        res.on("data", chunk => (data += chunk));
+        res.on("data", (chunk) => (data += chunk));
         res.on("end", async () => {
           const parsed: any = JSON.parse(data);
           if (!Array.isArray(parsed) || parsed.length === 0) {
@@ -101,8 +101,8 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
     const olderParts: string[] = older.split(".");
 
     for (let i: number = 0; i < Math.max(newerParts.length, olderParts.length); i++) {
-      let newerPart: number = parseInt((newerParts[i] || "0").match(/\d+/)[0] || "0", 10);
-      let olderPart: number = parseInt((olderParts[i] || "0").match(/\d+/)[0] || "0", 10);
+      const newerPart: number = parseInt((newerParts[i] || "0").match(/\d+/)[0] || "0", 10);
+      const olderPart: number = parseInt((olderParts[i] || "0").match(/\d+/)[0] || "0", 10);
       if (newerPart > olderPart) {
         return true;
       }
@@ -150,7 +150,7 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
     this.bot
       .deleteMessages(
         messages[0].channel.id,
-        messages.map(m => m.id),
+        messages.map((m) => m.id),
       )
       .catch(noop);
 
@@ -189,6 +189,7 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
   async versionRequest(msg: Message): Promise<void> {
     let reply: string;
 
+    // tslint:disable-next-line: prefer-conditional-expression
     if (UtilityPlugin.NEW_AVAILABLE) {
       reply = `New bot version available!\nCurrent bot version: **${UtilityPlugin.VERSION}**\nLatest version: **${UtilityPlugin.NEWEST_VERSION}**`;
     } else {
@@ -211,7 +212,7 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
       `\n${moment().toISOString()} | ${msg.author.id} | ${msg.author.username}#${msg.author.discriminator}: ${
         msg.cleanContent
       }`,
-      err => {
+      (err) => {
         if (err) {
           logger.info(err.name + "\n" + err.message);
         }

@@ -1,7 +1,7 @@
-import { disableCodeBlocks, resolveMember, resolveUser, UnknownUser, convertDelayStringToMS } from "./utils";
 import { GuildChannel } from "eris";
-import { TypeConversionError } from "knub-command-manager";
 import { ICommandContext } from "knub";
+import { TypeConversionError } from "knub-command-manager";
+import { convertDelayStringToMS, disableCodeBlocks, resolveMember, resolveUser, UnknownUser } from "./utils";
 
 export const customArgumentTypes = {
   delay(value) {

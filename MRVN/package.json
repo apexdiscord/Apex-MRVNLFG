@@ -7,8 +7,10 @@
   "scripts": {
     "start": "npx cross-env NODE_ENV=production node dist/index.js",
     "start-watch": "nodemon",
-    "format": "prettier --write \"./{src,src/plugins}/*.ts\"",
-    "build": "npm run format && npx rimraf dist && tsc"
+    "build": "npm run format && npx rimraf dist && tsc",
+    "lint": "tslint --project tsconfig.json \"./{src,src/plugins}/*.ts\"",
+    "codestyle-check": "prettier --check \"./{src,src/plugins}/*.ts\"",
+    "format": "prettier --write \"./{src,src/plugins}/*.ts\""
   },
   "dependencies": {
     "@types/js-yaml": "^3.12.2",
@@ -30,7 +32,8 @@
   "devDependencies": {
     "nodemon": "^2.0.3",
     "prettier": "^2.0.4",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "tslint-config-prettier": "^1.18.0"
   },
   "repository": {
     "type": "git",

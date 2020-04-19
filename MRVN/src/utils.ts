@@ -21,7 +21,7 @@ export function trimLines(str: string): string {
   return str
     .trim()
     .split("\n")
-    .map(l => l.trim())
+    .map((l) => l.trim())
     .join("\n")
     .trim();
 }
@@ -108,7 +108,7 @@ export async function resolveUser(bot: Client, value: string): Promise<User | Un
   if (!userId) {
     const usernameMatch: RegExpMatchArray = value.match(/^@?([^#]+)#(\d{4})$/);
     if (usernameMatch) {
-      const user: User = bot.users.find(u => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
+      const user: User = bot.users.find((u) => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
       if (user) {
         userId = user.id;
       }
@@ -125,7 +125,7 @@ export async function resolveUser(bot: Client, value: string): Promise<User | Un
     userId = value;
   }
 
-  const cachedUser: User = bot.users.find(u => u.id === userId);
+  const cachedUser: User = bot.users.find((u) => u.id === userId);
   if (cachedUser) {
     return cachedUser;
   }

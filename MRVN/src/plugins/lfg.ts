@@ -1,10 +1,10 @@
-import Knub, { decorators as d, IPluginOptions, getInviteLink, Plugin, logger } from "knub";
-import { Message, VoiceChannel, TextChannel, User, Member, Invite } from "eris";
-import { isNullOrUndefined } from "util";
-import { performance } from "perf_hooks";
-import { trimLines } from "../utils";
-import { passesFilter } from "../blockedWords";
+import { Invite, Member, Message, TextChannel, User, VoiceChannel } from "eris";
 import Eris = require("eris");
+import { decorators as d, getInviteLink, IPluginOptions, logger, Plugin } from "knub";
+import { performance } from "perf_hooks";
+import { isNullOrUndefined } from "util";
+import { passesFilter } from "../blockedWords";
+import { trimLines } from "../utils";
 
 interface ILfgPluginConfig {
   lfg_command_ident: string;
@@ -71,9 +71,9 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
 
   @d.event("messageCreate", "guild", true)
   async lfgRequest(msg: Message): Promise<void> {
-    let cfg: ILfgPluginConfig = this.getConfig();
-    let requestor: Member = msg.member;
-    let text: TextChannel = <TextChannel>this.bot.getChannel(msg.channel.id);
+    const cfg = this.getConfig();
+    const requestor = msg.member;
+    const text = this.bot.getChannel(msg.channel.id) as TextChannel;
     const start: any = performance.now();
 
     // check if the text channel is a valid LFG text channel
@@ -90,7 +90,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
         // make sure the text does not include a word blocked in blocked.yml
         if (passesFilter(msg.cleanContent)) {
           try {
-            let voice: VoiceChannel = <VoiceChannel>this.bot.getChannel(requestor.voiceState.channelID);
+            const voice = this.bot.getChannel(requestor.voiceState.channelID) as VoiceChannel;
             regex = new RegExp("^([^ß]|[ß])*" + cfg.lfg_voice_ident + "([^ß]|[ß])*$", "i");
 
             // make sure the users voice channel is a valid lfg voice channel
@@ -105,11 +105,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
                   userMessage = userMessage.replace(regex, "");
 
                   if (userMessage !== "") {
-                    if (cfg.lfg_message_compact) {
-                      userMessage = "`" + userMessage + "`";
-                    } else {
-                      userMessage = "```" + userMessage + "```";
-                    }
+                    userMessage = cfg.lfg_message_compact ? `\`${userMessage}\`` : `\`\`\`${userMessage}\`\`\``;
                   }
 
                   let emotes: boolean = false;
@@ -128,7 +124,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
 
                   await this.shrinkChannel(voice, userMessage, cfg);
 
-                  let toPost: any = await this.handleMessageCreation(voice, requestor.user, userMessage, emotes);
+                  const toPost: any = await this.handleMessageCreation(voice, requestor.user, userMessage, emotes);
                   msg.channel.createMessage(toPost);
 
                   logger.info(
@@ -179,7 +175,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
       } else {
         regex = new RegExp("^" + cfg.lfg_unshrink_ident + "([^ß]|[ß])*$", "i");
         if (cfg.lfg_enable_shrink && !isNullOrUndefined(msg.content.match(regex))) {
-          let voice: VoiceChannel = <VoiceChannel>this.bot.getChannel(requestor.voiceState.channelID);
+          const voice: VoiceChannel = this.bot.getChannel(requestor.voiceState.channelID) as VoiceChannel;
           regex = new RegExp("^([^ß]|[ß])*" + cfg.lfg_voice_ident + "([^ß]|[ß])*$", "i");
           if (!isNullOrUndefined(voice.name.match(regex))) {
             if (voice.userLimit !== cfg.lfg_shrink_normal_amt) {
@@ -214,7 +210,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
 
   @d.event("voiceChannelLeave", "guild", true)
   async resetChannelLimitLeave(member: Member, vc: VoiceChannel): Promise<any> {
-    let cfg: ILfgPluginConfig = this.getConfig();
+    const cfg: ILfgPluginConfig = this.getConfig();
 
     if (
       cfg.lfg_enable_shrink &&
@@ -228,7 +224,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
 
   @d.event("voiceChannelSwitch", "guild", true)
   async resetChannelLimitSwitch(member: Member, newVC: VoiceChannel, oldVC: VoiceChannel): Promise<any> {
-    let cfg: ILfgPluginConfig = this.getConfig();
+    const cfg: ILfgPluginConfig = this.getConfig();
 
     if (
       cfg.lfg_enable_shrink &&
@@ -264,18 +260,18 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
   }
 
   private async handleMessageCreation(vc: VoiceChannel, user: User, message: string, ranked: boolean): Promise<any> {
-    let cfg: ILfgPluginConfig = this.getConfig();
+    const cfg: ILfgPluginConfig = this.getConfig();
     let channelInfo: string = null;
-    let invite: Invite = await createInvite(vc);
+    const invite: Invite = await createInvite(vc);
 
     if (invite !== null) {
       if (cfg.lfg_message_compact) {
         channelInfo = user.mention;
 
         if (cfg.lfg_list_others) {
-          let otherUsers: Eris.Collection<Member> = vc.voiceMembers;
+          const otherUsers: Eris.Collection<Member> = vc.voiceMembers;
 
-          otherUsers.forEach(vcUser => {
+          otherUsers.forEach((vcUser) => {
             if (vcUser.id !== user.id) {
               let nick: string = vcUser.nick;
               if (nick === null) {
@@ -291,9 +287,9 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
         channelInfo = "Join " + user.mention;
 
         if (cfg.lfg_list_others) {
-          let otherUsers: Eris.Collection<Member> = vc.voiceMembers;
+          const otherUsers: Eris.Collection<Member> = vc.voiceMembers;
 
-          otherUsers.forEach(vcUser => {
+          otherUsers.forEach((vcUser) => {
             if (vcUser.id !== user.id) {
               let nick: string = vcUser.nick;
               if (nick === null) {
@@ -368,7 +364,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
 }
 
 export async function createInvite(vc: VoiceChannel): Promise<Invite> {
-  let existingInvites: Invite[] = await vc.getInvites();
+  const existingInvites: Invite[] = await vc.getInvites();
 
   if (existingInvites.length !== 0) {
     return existingInvites[0];
