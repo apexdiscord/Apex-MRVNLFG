@@ -21,7 +21,7 @@
     "https": "^1.0.0",
     "humanize-duration": "^3.22.0",
     "js-yaml": "^3.13.1",
-    "knub": "^26.1.1",
+    "knub": "^29.0.2",
     "moment-timezone": "^0.5.28",
     "ts-node": "^8.7.0",
     "typescript": "^3.8.3",
