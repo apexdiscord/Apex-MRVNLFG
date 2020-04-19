@@ -17,9 +17,16 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: npm install, lint, code style check
+    - name: npm ci
       working-directory: MRVN
       run: |
         npm ci
+    - name: lint
+      working-directory: MRVN
+      run: |
         npm run lint
+    - name: npm code style check
+      working-directory: MRVN
+      run: |
         npm run codestyle-check
+    
