@@ -8,7 +8,7 @@
     "start": "npx cross-env NODE_ENV=production node dist/index.js",
     "start-watch": "nodemon",
     "build": "npm run format && npx rimraf dist && tsc",
-    "lint": "tslint --project tsconfig.json \"./{src,src/plugins}/*.ts\"",
+    "lint": "tslint \"./{src,src/plugins}/*.ts\"",
     "codestyle-check": "prettier --check \"./{src,src/plugins}/*.ts\"",
     "format": "prettier --write \"./{src,src/plugins}/*.ts\""
   },
