@@ -1,11 +1,12 @@
-import yaml from "js-yaml";
 import path from "path";
-
 import fs from "fs";
+import yaml from "js-yaml";
+
 const fsp = fs.promises;
 
 import { Client } from "eris";
 import { Knub, logger } from "knub";
+import moment from "moment-timezone";
 import { loadRegex } from "./blockedWords";
 import { customArgumentTypes } from "./customArgumentTypes";
 import { LfgPlugin } from "./plugins/lfg";
@@ -19,7 +20,6 @@ const botClient: Client = new Client(`Bot ${process.env.TOKEN}`, {
   restMode: true,
 });
 
-import moment from "moment-timezone";
 // set TZ to UTC
 moment.tz.setDefault("Etc/UTC");
 
@@ -54,9 +54,8 @@ const bot: Knub = new Knub(botClient, {
     },
 
     logFn: (level, msg) => {
-      // tslint:disable-next-line
       if (level === "debug") return;
-      // tslint:disable-next-line
+      // eslint-disable-next-line no-console
       console.log(`[${level.toUpperCase()}] [${moment().toISOString()}] ${msg}`);
     },
 
@@ -65,8 +64,8 @@ const bot: Knub = new Knub(botClient, {
 });
 
 logger.info("Starting the bot");
-// tslint:disable-next-line
+
 bot.run();
-// tslint:disable-next-line
+
 loadRegex();
 startUptimeCount();

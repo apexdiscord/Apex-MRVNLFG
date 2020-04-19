@@ -1,8 +1,7 @@
+import { performance } from "perf_hooks";
 import { Invite, Member, Message, TextChannel, User, VoiceChannel } from "eris";
 import Eris = require("eris");
 import { decorators as d, getInviteLink, IPluginOptions, logger, Plugin } from "knub";
-import { performance } from "perf_hooks";
-import { isNullOrUndefined } from "util";
 import { passesFilter } from "../blockedWords";
 import { trimLines } from "../utils";
 
@@ -82,7 +81,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
       let regex: RegExp = new RegExp("^" + cfg.lfg_command_ident + "([^ß]|[ß])*$", "i");
 
       // check if the message is an actual LFG request
-      if (!isNullOrUndefined(msg.content.match(regex))) {
+      if (msg.content.match(regex) != null) {
         logger.info(
           `${requestor.id}: ${requestor.username}#${requestor.discriminator} Started LFG request in ${text.name}`,
         );
@@ -94,7 +93,7 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
             regex = new RegExp("^([^ß]|[ß])*" + cfg.lfg_voice_ident + "([^ß]|[ß])*$", "i");
 
             // make sure the users voice channel is a valid lfg voice channel
-            if (!isNullOrUndefined(voice.name.match(regex))) {
+            if (voice.name.match(regex) != null) {
               const voiceLimit: any = voice.userLimit > 0 ? voice.userLimit : 999;
               if (voice.voiceMembers.size < voiceLimit) {
                 let userMessage: string = msg.content.substring(cfg.lfg_command_ident.length).trim();
@@ -153,7 +152,6 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
             }
           } catch (error) {
             text.createMessage("Sorry, but you have to be in a lfg voice channel! " + requestor.mention);
-            // tslint:disable-next-line: max-line-length
             logger.info(
               `${requestor.id}: ${requestor.username}#${requestor.discriminator} stopped LFG request: Not in channel`,
             );
@@ -174,10 +172,10 @@ export class LfgPlugin extends Plugin<ILfgPluginConfig> {
         }
       } else {
         regex = new RegExp("^" + cfg.lfg_unshrink_ident + "([^ß]|[ß])*$", "i");
-        if (cfg.lfg_enable_shrink && !isNullOrUndefined(msg.content.match(regex))) {
+        if (cfg.lfg_enable_shrink && msg.content.match(regex) != null) {
           const voice: VoiceChannel = this.bot.getChannel(requestor.voiceState.channelID) as VoiceChannel;
           regex = new RegExp("^([^ß]|[ß])*" + cfg.lfg_voice_ident + "([^ß]|[ß])*$", "i");
-          if (!isNullOrUndefined(voice.name.match(regex))) {
+          if (voice.name.match(regex) != null) {
             if (voice.userLimit !== cfg.lfg_shrink_normal_amt) {
               try {
                 voice.edit({ userLimit: cfg.lfg_shrink_normal_amt });

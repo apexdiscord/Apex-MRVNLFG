@@ -43,7 +43,6 @@ export class UnknownUser {
   public discriminator = "0000";
 
   constructor(props: any = {}) {
-    // tslint:disable-next-line: forin
     for (const key in props) {
       this[key] = props[key];
     }
@@ -80,7 +79,7 @@ export async function resolveMember(bot: Client, guild: Guild, value: string): P
         member = await bot.getRESTGuildMember(guild.id, user.id);
         member.id = user.id;
         member.guild = guild;
-      } catch (e) {} // tslint:disable-line
+      } catch (e) { } // eslint-disable-line
     }
 
     if (!member) {
@@ -138,7 +137,7 @@ export async function resolveUser(bot: Client, value: string): Promise<User | Un
       const freshUser: User = await bot.getRESTUser(userId);
       bot.users.add(freshUser, bot);
       return freshUser;
-    } catch (e) {} // tslint:disable-line
+    } catch (e) { } // eslint-disable-line
 
     unknownUsers.add(userId);
   }
@@ -153,7 +152,7 @@ export function convertDelayStringToMS(str: string, defaultUnit: string = "m"): 
 
   str = str.trim();
 
-  // tslint:disable-next-line
+  
   while (str !== "" && (match = str.match(regex)) !== null) {
     ms += match[1] * ((match[2] && delayStringMultipliers[match[2]]) || delayStringMultipliers[defaultUnit]);
     str = str.slice(match[0].length);

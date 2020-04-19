@@ -1,11 +1,11 @@
-import { Member, Message } from "eris";
 import fs from "fs";
 import https from "https";
+import { performance } from "perf_hooks";
+import { Member, Message } from "eris";
 import humanizeDuration from "humanize-duration";
 import { decorators as d, IPluginOptions, logger, Plugin } from "knub";
 import { noop } from "knub/dist/utils";
 import moment from "moment-timezone";
-import { performance } from "perf_hooks";
 import { getUptime, trimLines } from "../utils";
 
 interface IUtilityPluginConfig {
@@ -189,7 +189,7 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
   async versionRequest(msg: Message): Promise<void> {
     let reply: string;
 
-    // tslint:disable-next-line: prefer-conditional-expression
+    // eslint-disable-next-line @typescript-eslint/tslint/config
     if (UtilityPlugin.NEW_AVAILABLE) {
       reply = `New bot version available!\nCurrent bot version: **${UtilityPlugin.VERSION}**\nLatest version: **${UtilityPlugin.NEWEST_VERSION}**`;
     } else {
@@ -206,7 +206,6 @@ export class UtilityPlugin extends Plugin<IUtilityPluginConfig> {
     const cfg: IUtilityPluginConfig = this.getConfig();
     msg.channel.createMessage(cfg.dm_response);
 
-    // tslint:disable-next-line: max-line-length
     fs.appendFile(
       "DMMessages.txt",
       `\n${moment().toISOString()} | ${msg.author.id} | ${msg.author.username}#${msg.author.discriminator}: ${

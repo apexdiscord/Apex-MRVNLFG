@@ -54,6 +54,7 @@ class Notification {
 
 enum ChannelType {
   TextChannel = 0,
+  // eslint-disable-next-line no-shadow
   VoiceChannel = 2,
   Category = 4,
 }
@@ -99,7 +100,7 @@ export class WherePlugin extends Plugin<IWherePluginConfig> {
       try {
         member = await this.bot.getRESTGuildMember(this.guildId, args.user.id);
       } catch (err) {
-        // tslint:disable-next-line: no-console
+        // eslint-disable-next-line no-console
         console.error(err);
       }
     } else {
