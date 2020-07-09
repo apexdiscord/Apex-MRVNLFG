@@ -8,11 +8,8 @@ import { Client } from "eris";
 import { Knub, logger } from "knub";
 import moment from "moment-timezone";
 import { loadRegex } from "./blockedWords";
-import { customArgumentTypes } from "./customArgumentTypes";
-import { LfgPlugin } from "./plugins/lfg";
-import { UtilityPlugin } from "./plugins/utility";
-import { WherePlugin } from "./plugins/where";
-import { errorMessage, startUptimeCount, successMessage } from "./utils";
+import { LfgPlugin } from "./plugins/Lfg/LfgPlugin";
+import { startUptimeCount } from "./utils";
 
 require("dotenv").config({ path: path.resolve(process.cwd(), "bot.env") });
 
@@ -24,19 +21,12 @@ const botClient: Client = new Client(`Bot ${process.env.TOKEN}`, {
 moment.tz.setDefault("Etc/UTC");
 
 const bot: Knub = new Knub(botClient, {
-  plugins: [UtilityPlugin, LfgPlugin, WherePlugin],
+  // plugins: [UtilityPlugin, LfgPlugin, WherePlugin],
+  guildPlugins: [LfgPlugin],
 
   globalPlugins: [],
 
   options: {
-    sendSuccessMessageFn(channel: any, body: any): void {
-      channel.createMessage(successMessage(body));
-    },
-
-    sendErrorMessageFn(channel: any, body: any): void {
-      channel.createMessage(errorMessage(body));
-    },
-
     async getConfig(id: any): Promise<any> {
       const configFile: any = id ? `${id}.yml` : "global.yml";
       const configPath: any = path.join("config", configFile);
@@ -58,8 +48,6 @@ const bot: Knub = new Knub(botClient, {
       // eslint-disable-next-line no-console
       console.log(`[${level.toUpperCase()}] [${moment().toISOString()}] ${msg}`);
     },
-
-    customArgumentTypes,
   },
 });
 

@@ -7,13 +7,10 @@
   "scripts": {
     "start": "npx cross-env NODE_ENV=production node dist/index.js",
     "watch": "nodemon",
-
     "lint": "eslint \"./{src,src/plugins}/*.ts\"",
     "lint-fix": "eslint --fix \"./{src,src/plugins}/*.ts\"",
-
     "format": "prettier --write \"./{src,src/plugins}/*.ts\"",
     "codestyle-check": "prettier --check \"./{src,src/plugins}/*.ts\"",
-
     "build": "npm run format && npm run lint-fix && npx rimraf dist && tsc"
   },
   "dependencies": {
@@ -23,14 +20,16 @@
     "bufferutil": "^4.0.1",
     "cross-env": "^7.0.2",
     "dotenv": "^8.2.0",
-    "eris": "^0.12.0",
+    "eris": "^0.13.3",
+    "fp-ts": "^2.7.0",
     "https": "^1.0.0",
     "humanize-duration": "^3.22.0",
+    "io-ts": "^2.2.7",
     "js-yaml": "^3.13.1",
-    "knub": "^29.0.2",
+    "knub": "^30.0.0-beta.10",
     "moment-timezone": "^0.5.28",
+    "typescript": "^3.9.6",
     "ts-node": "^8.9.0",
-    "typescript": "^3.8.3",
     "utf-8-validate": "^5.0.2"
   },
   "devDependencies": {
