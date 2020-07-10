@@ -11,6 +11,7 @@ import { loadRegex } from "./blockedWords";
 import { LfgPlugin } from "./plugins/Lfg/LfgPlugin";
 import { startUptimeCount } from "./utils";
 import { UtilityPlugin } from "./plugins/Utility/UtilityPlugin";
+import { WherePlugin } from "./plugins/Where/WherePlugin";
 
 require("dotenv").config({ path: path.resolve(process.cwd(), "bot.env") });
 
@@ -22,8 +23,7 @@ const botClient: Client = new Client(`Bot ${process.env.TOKEN}`, {
 moment.tz.setDefault("Etc/UTC");
 
 const bot: Knub = new Knub(botClient, {
-  // plugins: [UtilityPlugin, LfgPlugin, WherePlugin],
-  guildPlugins: [LfgPlugin, UtilityPlugin],
+  guildPlugins: [LfgPlugin, UtilityPlugin, WherePlugin],
 
   globalPlugins: [],
 
