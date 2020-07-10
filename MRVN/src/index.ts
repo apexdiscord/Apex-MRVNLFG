@@ -10,6 +10,7 @@ import moment from "moment-timezone";
 import { loadRegex } from "./blockedWords";
 import { LfgPlugin } from "./plugins/Lfg/LfgPlugin";
 import { startUptimeCount } from "./utils";
+import { UtilityPlugin } from "./plugins/Utility/UtilityPlugin";
 
 require("dotenv").config({ path: path.resolve(process.cwd(), "bot.env") });
 
@@ -22,7 +23,7 @@ moment.tz.setDefault("Etc/UTC");
 
 const bot: Knub = new Knub(botClient, {
   // plugins: [UtilityPlugin, LfgPlugin, WherePlugin],
-  guildPlugins: [LfgPlugin],
+  guildPlugins: [LfgPlugin, UtilityPlugin],
 
   globalPlugins: [],
 
