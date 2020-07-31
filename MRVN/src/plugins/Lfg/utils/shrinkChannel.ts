@@ -1,5 +1,5 @@
 import { VoiceChannel } from "eris";
-import { logger } from "knub";
+import { logger } from "../../../logger";
 
 export async function shrinkChannel(voice: VoiceChannel, userMessage: string, cfg: any): Promise < void> {
     if(cfg.lfg_enable_shrink) {

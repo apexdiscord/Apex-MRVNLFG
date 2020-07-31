@@ -5,7 +5,7 @@ import { sendErrorMessage } from "../../../pluginUtils";
 import moment from "moment-timezone";
 import { Notification } from "../utils/Notification";
 import humanizeDuration from "humanize-duration";
-import { logger } from "knub";
+import { logger } from "../../../logger";
 
 export const VcNotifyCmd = whereCommand({
     trigger: ["vcnotify", "v", "vc", "vcn"],

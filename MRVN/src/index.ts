@@ -5,13 +5,14 @@ import yaml from "js-yaml";
 const fsp = fs.promises;
 
 import { Client } from "eris";
-import { Knub, logger } from "knub";
+import { Knub } from "knub";
 import moment from "moment-timezone";
 import { loadRegex } from "./blockedWords";
 import { LfgPlugin } from "./plugins/Lfg/LfgPlugin";
 import { startUptimeCount } from "./utils";
 import { UtilityPlugin } from "./plugins/Utility/UtilityPlugin";
 import { WherePlugin } from "./plugins/Where/WherePlugin";
+import { logger } from "./logger";
 
 require("dotenv").config({ path: path.resolve(process.cwd(), "bot.env") });
 

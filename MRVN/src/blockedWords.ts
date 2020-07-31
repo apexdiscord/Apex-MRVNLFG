@@ -29,5 +29,5 @@ export async function loadRegex(): Promise<void> {
   const yamlString: string = await fsp.readFile(blockedPath, {
     encoding: "utf8",
   });
-  blockedRegex = yaml.safeLoad(yamlString);
+  blockedRegex = yaml.safeLoad(yamlString) as string[];
 }

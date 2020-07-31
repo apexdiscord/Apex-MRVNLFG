@@ -1,11 +1,11 @@
 import { lfgEvent } from "../types";
 import { performance } from "perf_hooks";
 import { TextChannel, VoiceChannel } from "eris";
-import { logger } from "knub";
 import { passesFilter } from "../../../blockedWords";
 import { shrinkChannel } from "../utils/shrinkChannel";
 import { handleMessageCreation } from "../utils/handleMessageCreation";
 import { updateDelayTime } from "../utils/updateDelayTime";
+import { logger } from "../../../logger";
 
 export const MessageCreateEvt = lfgEvent({
     event: "messageCreate",

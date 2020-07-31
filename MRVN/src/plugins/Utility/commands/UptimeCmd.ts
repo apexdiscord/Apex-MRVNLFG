@@ -1,7 +1,8 @@
-import { logger } from "knub";
+
 import { utilityCommand } from "../types";
 import humanizeDuration from "humanize-duration";
 import { getUptime } from "../../../utils";
+import { logger } from "../../../logger";
 
 export const UptimeCmd = utilityCommand({
     trigger: "uptime",

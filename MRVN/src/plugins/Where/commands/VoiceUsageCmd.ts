@@ -1,5 +1,5 @@
 import { whereCommand } from "../types";
-import { logger } from "knub";
+import { logger } from "../../../logger";
 import { AnyGuildChannel, Collection, VoiceChannel } from "eris";
 import { ChannelType } from "../utils/ChannelType";
 

@@ -1,6 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { Member } from "eris";
-import { logger } from "knub";
+import { logger } from "../../../logger";
 import { whereCommand } from "../types";
 import { UnknownUser, resolveMember } from "../../../utils";
 import { sendErrorMessage } from "../../../pluginUtils";

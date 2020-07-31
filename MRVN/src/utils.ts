@@ -1,5 +1,5 @@
 import { Client, Guild, Member, User } from "eris";
-import { logger } from "knub";
+import { logger } from "./logger";
 
 const delayStringMultipliers: any = {
   w: 1000 * 60 * 60 * 24 * 7,

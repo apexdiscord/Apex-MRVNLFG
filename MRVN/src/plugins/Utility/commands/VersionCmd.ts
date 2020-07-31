@@ -1,8 +1,4 @@
 import { utilityCommand } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { Member } from "eris";
-import { logger } from "knub";
-import { getMemberLevel } from "knub/dist/helpers";
 
 export const VersionCmd = utilityCommand({
     trigger: "version",

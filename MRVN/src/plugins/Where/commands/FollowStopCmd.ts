@@ -1,7 +1,7 @@
 import { whereCommand } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendSuccessMessage } from "../../../pluginUtils";
-import { logger } from "knub";
+import { logger } from "../../../logger";
 import { removeNotifyforUserId } from "../utils/removeNotifyForUserId";
 
 export const FollowStopCmd = whereCommand({

@@ -1,10 +1,9 @@
-import { logger } from "knub";
 import { trimLines } from "../../../utils";
-import { sendErrorMessage } from "../../../pluginUtils";
 import { utilityCommand } from "../types";
 import { Message } from "eris";
 import { performance } from "perf_hooks";
 import { noop } from "knub/dist/utils";
+import { logger } from "../../../logger";
 
 export const PingCmd = utilityCommand({
     trigger: "ping",

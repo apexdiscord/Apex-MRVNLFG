@@ -1,6 +1,6 @@
 import { Guild, Member, TextableChannel, VoiceChannel, ChannelInvite } from "eris";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { logger } from "knub";
+import { logger } from "../../../logger";
 import { createOrReuseInvite } from "./createOrReuseInvite";
 import { getInviteLink } from "knub/dist/helpers";
 

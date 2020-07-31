@@ -1,6 +1,5 @@
 import * as t from "io-ts";
 import { BasePluginType, command, eventListener } from "knub";
-import { event } from "knub/dist/plugins/decorators";
 
 export const ConfigSchema = t.type({
     lfg_command_ident: t.string,

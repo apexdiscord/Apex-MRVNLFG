@@ -1,8 +1,8 @@
 import { utilityEvent } from "../types";
 import { onlyDM } from "knub/dist/events/eventFilters";
-import { logger } from "knub";
 import fs from "fs";
 import moment from "moment-timezone";
+import { logger } from "../../../logger";
 
 export const DmMessageCreateEvt = utilityEvent({
     event: "messageCreate",

@@ -1,7 +1,8 @@
-import { PluginData, logger } from "knub";
+import { PluginData } from "knub";
 import https from "https";
 import { UtilityPluginType } from "../types";
 import { compareVersions } from "./compareVersions";
+import { logger } from "../../../logger";
 
 const UPDATE_LOOP_TIME: number = 60 * 60 * 1000;
 

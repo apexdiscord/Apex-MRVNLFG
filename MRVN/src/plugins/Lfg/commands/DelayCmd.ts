@@ -1,7 +1,7 @@
 import { lfgCommand } from "../types";
-import { logger } from "knub";
 import { trimLines } from "../../../utils";
 import { sendErrorMessage } from "../../../pluginUtils";
+import { logger } from "../../../logger";
 
 export const DelayCmd = lfgCommand({
     trigger: "delay",
