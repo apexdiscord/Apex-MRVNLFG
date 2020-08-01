@@ -7,6 +7,7 @@ import moment from "moment-timezone";
 import { Notification } from "../utils/Notification";
 import humanizeDuration from "humanize-duration";
 import { logger } from "../../../logger";
+import { saveActiveNotifications } from "../utils/saveActiveNotifications";
 
 export const NotifyCmd = whereCommand({
     trigger: ["notify", "n"],
@@ -32,6 +33,8 @@ export const NotifyCmd = whereCommand({
 
         const endTime: any = moment().add(timeout, "ms");
         pluginData.state.activeNotifications.push(new Notification(msg.author.id, member.id, msg.channel.id, endTime, false, false));
+        saveActiveNotifications(pluginData);
+        
         msg.channel.createMessage(
             `If <@!${member.id}> joins or switches VC in the next ${humanizeDuration(timeout)} i will notify you`,
         );

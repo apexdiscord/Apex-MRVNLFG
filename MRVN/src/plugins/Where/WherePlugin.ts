@@ -10,11 +10,13 @@ import { VoiceChannelJoinEvt } from "./events/VoiceChannelJoinEvt";
 import { VoiceChannelSwitchEvt } from "./events/VoiceChannelSwitchEvt";
 import { VoiceChannelLeaveEvt } from "./events/VoiceChannelLeaveEvt";
 import { GuildBanAddEvt } from "./events/GuildBanAddEvt";
+import { loadActiveNotifications } from "./utils/loadActiveNotifications";
 
 const defaultOptions: PluginOptions<WherePluginType> = {
     config: {
         where_timeout: 600000,
         update_notification: true,
+        persist_notifications: true,
 
         can_where: false,
         can_notify: false,
@@ -60,5 +62,6 @@ export const WherePlugin = plugin<WherePluginType>()("where", {
 
         state.activeNotifications = [];
         state.activeVCNotifications = [];
+        loadActiveNotifications(pluginData);
     },
 });

@@ -6,6 +6,7 @@ import moment from "moment-timezone";
 import { Notification } from "../utils/Notification";
 import humanizeDuration from "humanize-duration";
 import { logger } from "../../../logger";
+import { saveActiveNotifications } from "../utils/saveActiveNotifications";
 
 export const VcNotifyCmd = whereCommand({
     trigger: ["vcnotify", "v", "vc", "vcn"],
@@ -31,6 +32,8 @@ export const VcNotifyCmd = whereCommand({
         pluginData.state.activeVCNotifications.push(
             new Notification(msg.author.id, args.channelId, msg.channel.id, endTime, false, false),
         );
+        saveActiveNotifications(pluginData);
+        
         msg.channel.createMessage(
             `I will notify you of all changes in \`${channel.name}\` for the next ${humanizeDuration(timeout)}`,
         );

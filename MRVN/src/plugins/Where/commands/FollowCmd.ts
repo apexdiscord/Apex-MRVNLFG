@@ -7,6 +7,7 @@ import moment from "moment-timezone";
 import { Notification } from "../utils/Notification";
 import humanizeDuration from "humanize-duration";
 import { logger } from "../../../logger";
+import { saveActiveNotifications } from "../utils/saveActiveNotifications";
 
 export const FollowCmd = whereCommand({
     trigger: ["follow", "f"],
@@ -35,6 +36,7 @@ export const FollowCmd = whereCommand({
 
         const endTime: any = moment().add(timeout, "ms");
         pluginData.state.activeNotifications.push(new Notification(msg.author.id, member.id, msg.channel.id, endTime, true, active));
+        saveActiveNotifications(pluginData);
 
         if (!active) {
             msg.channel.createMessage(

@@ -53,6 +53,10 @@ const bot: Knub = new Knub(botClient, {
   },
 });
 
+if (!fs.existsSync("./notifications")) {
+  fs.mkdirSync("./notifications");
+}
+
 logger.info("Starting the bot");
 
 bot.run();

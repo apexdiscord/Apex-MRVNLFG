@@ -1,6 +1,7 @@
 import { PluginData } from "knub";
 import { WherePluginType } from "../types";
 import { Notification } from "./Notification";
+import { saveActiveNotifications } from "./saveActiveNotifications";
 
 export async function removeVCNotifyforChannelId(pluginData: PluginData<WherePluginType>, userId: string): Promise <void> {
     const newNotifies: Notification[] = [];
@@ -12,4 +13,5 @@ export async function removeVCNotifyforChannelId(pluginData: PluginData<WherePlu
     }
 
     pluginData.state.activeVCNotifications = newNotifies;
+    saveActiveNotifications(pluginData);
 }

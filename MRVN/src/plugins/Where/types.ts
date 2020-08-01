@@ -4,6 +4,7 @@ import { BasePluginType, command, eventListener } from "knub";
 export const ConfigSchema = t.type({
     where_timeout: t.number,
     update_notification: t.boolean,
+    persist_notifications: t.boolean,
 
     can_where: t.boolean,
     can_notify: t.boolean,
