@@ -8,62 +8,62 @@ import { VersionCmd } from "./commands/VersionCmd";
 import { DmMessageCreateEvt } from "./events/DmMessageCreateEvt";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
-    config: {
-        can_ping: false,
-        can_level: false,
-        can_uptime: false,
-        can_version: false,
+  config: {
+    can_ping: false,
+    can_level: false,
+    can_uptime: false,
+    can_version: false,
 
-        dm_response: "Sorry, but you can only control this bot through commands within the server!",
+    dm_response: "Sorry, but you can only control this bot through commands within the server!",
+  },
+  overrides: [
+    {
+      level: ">=1",
+      config: {
+        can_level: true,
+      },
     },
-    overrides: [
-        {
-            level: ">=1",
-            config: {
-                can_level: true,
-            },
-        },
-        {
-            level: ">=50",
-            config: {
-                can_ping: true,
-                can_uptime: true,
-                can_version: true,
-            },
-        },
-    ],
+    {
+      level: ">=50",
+      config: {
+        can_ping: true,
+        can_uptime: true,
+        can_version: true,
+      },
+    },
+  ],
 };
 
 export const UtilityPlugin = plugin<UtilityPluginType>()("utility", {
-    defaultOptions,
+  defaultOptions,
 
-    // prettier-ignore
-    commands: [
+  // prettier-ignore
+  commands: [
         PingCmd,
         LevelCmd,
         UptimeCmd,
         VersionCmd,
     ],
 
-    // prettier-ignore
-    events: [
+  // prettier-ignore
+  events: [
         DmMessageCreateEvt,
     ],
 
-    onLoad(pluginData) {
-        const { state } = pluginData;
+  onLoad(pluginData) {
+    const { state } = pluginData;
 
-        state.VERSION = "1.0.5";
-        state.NEWEST_VERSION = state.VERSION;
-        state.NEW_AVAILABLE = false;
+    state.VERSION = "1.0.5";
+    state.NEWEST_VERSION = state.VERSION;
+    state.NEW_AVAILABLE = false;
 
-        state.unloaded = false;
-        state.updateTimeout = null;
+    state.unloaded = false;
+    state.updateTimeout = null;
 
-        updateLoop(pluginData);
-    },
+    updateLoop(pluginData);
+  },
 
-    onUnload(pluginData) {
-        pluginData.state.unloaded = true;
-    }
+  onUnload(pluginData) {
+    pluginData.state.unloaded = true;
+  },
 });
