@@ -12,6 +12,7 @@ import { LfgPlugin } from "./plugins/Lfg/LfgPlugin";
 import { startUptimeCount } from "./utils";
 import { UtilityPlugin } from "./plugins/Utility/UtilityPlugin";
 import { WherePlugin } from "./plugins/Where/WherePlugin";
+import { ApexEventsPlugin } from "./plugins/ApexEvents/ApexEventsPlugin";
 import { logger } from "./logger";
 import { connect } from "./data/db";
 
