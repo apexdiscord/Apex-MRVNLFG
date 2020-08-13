@@ -5,9 +5,7 @@ import { whereCommand } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { UnknownUser, resolveMember } from "../../../utils";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { Notification } from "../utils/Notification";
 import { logger } from "../../../logger";
-import { saveActiveNotifications } from "../utils/saveActiveNotifications";
 
 export const FollowCmd = whereCommand({
   trigger: ["follow", "f"],
@@ -35,10 +33,8 @@ export const FollowCmd = whereCommand({
     }
 
     const endTime: any = moment().add(timeout, "ms");
-    pluginData.state.activeNotifications.push(
-      new Notification(msg.author.id, member.id, msg.channel.id, endTime, true, active),
-    );
-    saveActiveNotifications(pluginData);
+
+    pluginData.state.notifyRequests.add(msg.author.id, member.id, msg.channel.id, endTime, true, active);
 
     if (!active) {
       msg.channel.createMessage(

@@ -5,9 +5,7 @@ import { whereCommand } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { UnknownUser, resolveMember } from "../../../utils";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { Notification } from "../utils/Notification";
 import { logger } from "../../../logger";
-import { saveActiveNotifications } from "../utils/saveActiveNotifications";
 
 export const NotifyCmd = whereCommand({
   trigger: ["notify", "n"],
@@ -32,10 +30,8 @@ export const NotifyCmd = whereCommand({
     const timeout: any = args.time != null ? args.time : cfg.where_timeout;
 
     const endTime: any = moment().add(timeout, "ms");
-    pluginData.state.activeNotifications.push(
-      new Notification(msg.author.id, member.id, msg.channel.id, endTime, false, false),
-    );
-    saveActiveNotifications(pluginData);
+
+    pluginData.state.notifyRequests.add(msg.author.id, member.id, msg.channel.id, endTime, false, false);
 
     msg.channel.createMessage(
       `If <@!${member.id}> joins or switches VC in the next ${humanizeDuration(timeout)} i will notify you`,

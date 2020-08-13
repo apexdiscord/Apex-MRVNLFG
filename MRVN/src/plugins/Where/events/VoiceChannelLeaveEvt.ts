@@ -1,7 +1,5 @@
-import { TextableChannel, Member, VoiceChannel } from "eris";
+import { TextableChannel, VoiceChannel } from "eris";
 import { whereEvent } from "../types";
-import { removeNotifyforUserId } from "../utils/removeNotifyForUserId";
-import { removeVCNotifyforChannelId } from "../utils/removeNotifyForChannelId";
 
 export const VoiceChannelLeaveEvt = whereEvent({
   event: "voiceChannelLeave",
@@ -13,42 +11,24 @@ export const VoiceChannelLeaveEvt = whereEvent({
 
     let obsolete: boolean = false;
 
-    pluginData.state.activeVCNotifications.forEach((notif) => {
-      if (notif.subjectId === channel.id) {
-        if (Date.now() >= notif.endTime) {
-          obsolete = true;
-        } else {
-          const text = pluginData.client.getChannel(notif.channelId) as TextableChannel;
-          const voice = pluginData.client.getChannel(notif.subjectId) as VoiceChannel;
-          text.createMessage(
-            `🔴 <@!${notif.modId}> The user <@!${member.id}> disconnected out of the channel \`${voice.name}\``,
+    const notifies = await pluginData.state.notifyRequests.getAllForUserId(member.id);
+
+    notifies.forEach(async (notif) => {
+      if (notif.endTime >= Date.now()) {
+        if (notif.persist) {
+          const tchannel = pluginData.client.getChannel(notif.channel_id) as TextableChannel;
+          const voice = pluginData.client.getChannel(channel.id) as VoiceChannel;
+          tchannel.createMessage(
+            `<@!${notif.requestor_id}> The user <@!${member.id}> disconnected out of the channel \`${voice.name}\``,
           );
         }
+      } else {
+        obsolete = true;
       }
     });
 
     if (obsolete) {
-      removeVCNotifyforChannelId(pluginData, member.id);
-    }
-
-    pluginData.state.activeNotifications.forEach(async (notif) => {
-      if (notif.subjectId === member.id) {
-        if (notif.endTime >= Date.now()) {
-          if (notif.persist) {
-            const tchannel = pluginData.client.getChannel(notif.channelId) as TextableChannel;
-            const voice = pluginData.client.getChannel(channel.id) as VoiceChannel;
-            tchannel.createMessage(
-              `<@!${notif.modId}> The user <@!${member.id}> disconnected out of the channel \`${voice.name}\``,
-            );
-          }
-        } else {
-          obsolete = true;
-        }
-      }
-    });
-
-    if (obsolete) {
-      removeNotifyforUserId(pluginData, member.id);
+      pluginData.state.notifyRequests.removeAllUserNotifiesForUserId(member.id);
     }
   },
 });

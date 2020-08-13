@@ -12,3 +12,5 @@ VSCNodeMRVN.code-workspace
 MRVN/config/551767165846552589.yml
 
 MRVN/notifications/
+
+*.sqlite

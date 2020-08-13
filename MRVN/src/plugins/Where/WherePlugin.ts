@@ -1,8 +1,8 @@
 import { PluginOptions, plugin } from "knub";
+import { GuildNotifyRequests } from "../../data/GuildNotifyRequests";
 import { WherePluginType } from "./types";
 import { WhereCmd } from "./commands/WhereCmd";
 import { NotifyCmd } from "./commands/NotifyCmd";
-import { VcNotifyCmd } from "./commands/VcNotifyCmd";
 import { FollowCmd } from "./commands/FollowCmd";
 import { FollowStopCmd } from "./commands/FollowStopCmd";
 import { VoiceUsageCmd } from "./commands/VoiceUsageCmd";
@@ -10,13 +10,11 @@ import { VoiceChannelJoinEvt } from "./events/VoiceChannelJoinEvt";
 import { VoiceChannelSwitchEvt } from "./events/VoiceChannelSwitchEvt";
 import { VoiceChannelLeaveEvt } from "./events/VoiceChannelLeaveEvt";
 import { GuildBanAddEvt } from "./events/GuildBanAddEvt";
-import { loadActiveNotifications } from "./utils/loadActiveNotifications";
 
 const defaultOptions: PluginOptions<WherePluginType> = {
   config: {
     where_timeout: 600000,
     update_notification: true,
-    persist_notifications: true,
 
     can_where: false,
     can_notify: false,
@@ -43,7 +41,6 @@ export const WherePlugin = plugin<WherePluginType>()("where", {
   commands: [
         WhereCmd,
         NotifyCmd,
-        VcNotifyCmd,
         FollowCmd,
         FollowStopCmd,
         VoiceUsageCmd,
@@ -58,10 +55,8 @@ export const WherePlugin = plugin<WherePluginType>()("where", {
     ],
 
   onLoad(pluginData) {
-    const { state } = pluginData;
+    const { state, guild } = pluginData;
 
-    state.activeNotifications = [];
-    state.activeVCNotifications = [];
-    loadActiveNotifications(pluginData);
+    state.notifyRequests = GuildNotifyRequests.getGuildInstance(guild.id);
   },
 });

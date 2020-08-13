@@ -1,4 +1,4 @@
-// tslint-disable:no-console
+/* eslint-disable no-console */
 
 export const logger = {
   info(...args: Parameters<typeof console.log>) {

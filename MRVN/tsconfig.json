@@ -5,6 +5,7 @@
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
+    "allowJs": true,
     "emitDecoratorMetadata": true,
     "target": "esnext",
     "lib": [

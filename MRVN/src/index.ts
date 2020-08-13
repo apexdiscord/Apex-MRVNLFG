@@ -13,53 +13,66 @@ import { startUptimeCount } from "./utils";
 import { UtilityPlugin } from "./plugins/Utility/UtilityPlugin";
 import { WherePlugin } from "./plugins/Where/WherePlugin";
 import { logger } from "./logger";
+import { connect } from "./data/db";
 
 require("dotenv").config({ path: path.resolve(process.cwd(), "bot.env") });
-
-const botClient: Client = new Client(`Bot ${process.env.TOKEN}`, {
-  restMode: true,
-});
 
 // set TZ to UTC
 moment.tz.setDefault("Etc/UTC");
 
-const bot: Knub = new Knub(botClient, {
-  guildPlugins: [LfgPlugin, UtilityPlugin, WherePlugin],
+connect().then(async () => {
+  const botClient = new Client(`Bot ${process.env.TOKEN}`, {
+    restMode: true,
+    getAllUsers: false,
+    compress: true,
 
-  globalPlugins: [],
+    intents: ["guildMessages", "directMessages", "guilds", "guildBans", "guildVoiceStates", "guildMessageReactions"],
+  });
 
-  options: {
-    async getConfig(id: any): Promise<any> {
-      const configFile: any = id ? `${id}.yml` : "global.yml";
-      const configPath: any = path.join("config", configFile);
+  botClient.on("debug", (message) => {
+    if (message.includes(" 429 ")) {
+      logger.info(`[RateLimit] ${message}`);
+    }
+  });
 
-      try {
-        await fsp.access(configPath);
-      } catch (e) {
-        return {};
-      }
+  const bot: Knub = new Knub(botClient, {
+    guildPlugins: [LfgPlugin, UtilityPlugin, WherePlugin],
 
-      const yamlString: any = await fsp.readFile(configPath, {
-        encoding: "utf8",
-      });
-      return yaml.safeLoad(yamlString);
+    globalPlugins: [],
+
+    options: {
+      async getConfig(id: any): Promise<any> {
+        const configFile: any = id ? `${id}.yml` : "global.yml";
+        const configPath: any = path.join("config", configFile);
+
+        try {
+          await fsp.access(configPath);
+        } catch (e) {
+          return {};
+        }
+
+        const yamlString: any = await fsp.readFile(configPath, {
+          encoding: "utf8",
+        });
+        return yaml.safeLoad(yamlString);
+      },
+
+      logFn: (level, msg) => {
+        if (level === "debug") return;
+        // eslint-disable-next-line no-console
+        console.log(`[${level.toUpperCase()}] [${moment().toISOString()}] ${msg}`);
+      },
     },
+  });
 
-    logFn: (level, msg) => {
-      if (level === "debug") return;
-      // eslint-disable-next-line no-console
-      console.log(`[${level.toUpperCase()}] [${moment().toISOString()}] ${msg}`);
-    },
-  },
+  if (!fs.existsSync("./notifications")) {
+    fs.mkdirSync("./notifications");
+  }
+
+  logger.info("Starting the bot");
+
+  bot.run();
+
+  loadRegex();
+  startUptimeCount();
 });
-
-if (!fs.existsSync("./notifications")) {
-  fs.mkdirSync("./notifications");
-}
-
-logger.info("Starting the bot");
-
-bot.run();
-
-loadRegex();
-startUptimeCount();
