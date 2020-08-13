@@ -5,8 +5,11 @@ import { logger } from "../../../logger";
 import { compareVersions } from "./compareVersions";
 
 const UPDATE_LOOP_TIME: number = 60 * 60 * 1000;
+const DEVELOPMENT: boolean = true;
 
 export async function updateLoop(pluginData: PluginData<UtilityPluginType>): Promise<void> {
+  if (DEVELOPMENT) return;
+
   https.get(
     {
       hostname: "api.github.com",

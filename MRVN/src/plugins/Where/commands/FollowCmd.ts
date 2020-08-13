@@ -32,8 +32,7 @@ export const FollowCmd = whereCommand({
       return;
     }
 
-    const endTime: any = moment().add(timeout, "ms");
-
+    const endTime: any = moment().add(timeout, "ms").valueOf();
     pluginData.state.notifyRequests.add(msg.author.id, member.id, msg.channel.id, endTime, true, active);
 
     if (!active) {

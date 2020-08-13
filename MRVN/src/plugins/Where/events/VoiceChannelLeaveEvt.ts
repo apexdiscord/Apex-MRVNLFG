@@ -1,5 +1,6 @@
 import { TextableChannel, VoiceChannel } from "eris";
 import { whereEvent } from "../types";
+import moment from "moment-timezone";
 
 export const VoiceChannelLeaveEvt = whereEvent({
   event: "voiceChannelLeave",
@@ -14,9 +15,9 @@ export const VoiceChannelLeaveEvt = whereEvent({
     const notifies = await pluginData.state.notifyRequests.getAllForUserId(member.id);
 
     notifies.forEach(async (notif) => {
-      if (notif.endTime >= Date.now()) {
+      if (moment(notif.endTime) >= moment()) {
         if (notif.persist) {
-          const tchannel = pluginData.client.getChannel(notif.channel_id) as TextableChannel;
+          const tchannel: TextableChannel = pluginData.guild.channels.get(notif.channel_id) as TextableChannel;
           const voice = pluginData.client.getChannel(channel.id) as VoiceChannel;
           tchannel.createMessage(
             `<@!${notif.requestor_id}> The user <@!${member.id}> disconnected out of the channel \`${voice.name}\``,

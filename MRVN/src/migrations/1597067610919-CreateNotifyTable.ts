@@ -15,23 +15,19 @@ export class CreateNotifyTable1597067610919 implements MigrationInterface {
           },
           {
             name: "guild_id",
-            type: "bigint",
-            unsigned: true,
+            type: "text",
           },
           {
             name: "requestor_id",
-            type: "bigint",
-            unsigned: true,
+            type: "text",
           },
           {
             name: "user_id",
-            type: "bigint",
-            unsigned: true,
+            type: "text",
           },
           {
             name: "channel_id",
-            type: "bigint",
-            unsigned: true,
+            type: "text",
           },
           {
             name: "endTime",
