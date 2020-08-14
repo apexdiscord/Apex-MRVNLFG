@@ -1,12 +1,11 @@
 import { getMemberLevel } from "knub/dist/helpers";
-import { apexEventsCommand, TAsk } from "../types";
+import { EmbedOptions, User } from "eris";
+import { eventsCommand } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { saveAskMessages } from "../utils/saveAskMessages";
-import { EmbedOptions, User } from "eris";
 import { resolveUser } from "../../../utils";
 
-export const CloseEventCmd = apexEventsCommand({
+export const CloseEventCmd = eventsCommand({
   trigger: "event close",
   permission: null,
   source: "guild",
@@ -21,35 +20,29 @@ export const CloseEventCmd = apexEventsCommand({
       return;
     }
 
-    const evt = pluginData.state.events.find((x) => x.event_id === args.eventId);
+    const evt = await pluginData.state.guildEvents.findByEventId(args.eventId);
     if (!evt) {
       sendErrorMessage(msg.channel, "There is no event with that ID!");
       return;
     }
 
-    if (evt.author_id !== msg.author.id && getMemberLevel(pluginData, msg.member) < cfg.level_override) {
-      sendErrorMessage(msg.channel, "You are not the author of that event!");
+    if (evt.creator_id !== msg.author.id && getMemberLevel(pluginData, msg.member) < cfg.level_override) {
+      sendErrorMessage(msg.channel, "You are not the creator of that event!");
       return;
     }
 
-    const newAsks: TAsk[] = [];
-    for (const oldask of pluginData.state.asks) {
-      if (args.eventId === oldask.event_id) continue;
-      newAsks.push(oldask);
-    }
-    pluginData.state.asks = newAsks;
-    saveAskMessages(pluginData);
+    pluginData.state.guildEvents.markEventClosed(evt.id)
 
-    const author = await resolveUser(pluginData.client, evt.author_id) as User;
+    const author = (await resolveUser(pluginData.client, evt.creator_id)) as User;
     const embed: EmbedOptions = {
       fields: [],
     };
     embed.author = { name: author.username, icon_url: author.avatarURL };
-    embed.title = evt.event_title;
-    embed.description = "**Registration for this event is now closed!**\n" + evt.event_description;
+    embed.title = evt.title;
+    embed.description = "**Registration for this event is now closed!**\n" + evt.description;
     embed.color = 0x013447;
 
-    const evtMsg = await pluginData.client.getMessage(cfg.events_announce_channel, evt.announce_message_id);
+    const evtMsg = await pluginData.client.getMessage(cfg.events_announce_channel, evt.announce_id);
     if (evtMsg) {
       await evtMsg.edit({ embed });
       await evtMsg.removeReactions();

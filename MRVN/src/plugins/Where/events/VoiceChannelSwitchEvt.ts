@@ -1,8 +1,8 @@
 import { TextableChannel, Member } from "eris";
+import moment from "moment-timezone";
 import { whereEvent } from "../types";
 import { sendWhere } from "../utils/sendWhere";
 import { sendErrorMessage } from "../../../pluginUtils";
-import moment from "moment-timezone";
 import { moveRequestor } from "../utils/moveRequestor";
 
 export const VoiceChannelSwitchEvt = whereEvent({

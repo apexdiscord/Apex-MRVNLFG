@@ -1,17 +1,14 @@
 import { Message, TextableChannel, EmbedOptions, VoiceChannel, User } from "eris";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
-import { apexEventsEvent, TEvent, TAsk } from "../types";
-import { getEventForAnnounceMessageId } from "../utils/getEventForAnnounceMessageId";
+import { eventsEvent } from "../types";
 import { resolveMember, resolveUser } from "../../../utils";
-import { getAskForAskMessageId } from "../utils/getEventForAskMessageId";
-import { saveAskMessages } from "../utils/saveAskMessages";
 
-export const EventReactionAddEvt = apexEventsEvent({
+export const EventReactionAddEvt = eventsEvent({
   event: "messageReactionAdd",
 
   async listener(meta) {
-    const pluginData = meta.pluginData;
+    /* const pluginData = meta.pluginData;
     const cfg = pluginData.config.get();
     const msg = meta.args.message as Message;
     const emoji = meta.args.emoji;
@@ -105,6 +102,6 @@ export const EventReactionAddEvt = apexEventsEvent({
       embed.description = `Event Name: **${evt.event_title}**\nEvent by: <@${evt.author_id}>`;
       embed.color = 0x16d94d;
       await msg.edit({ embed });
-    }
+    }*/
   },
 });

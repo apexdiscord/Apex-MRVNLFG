@@ -1,9 +1,9 @@
 import { getMemberLevel } from "knub/dist/helpers";
-import { apexEventsCommand } from "../types";
+import { eventsCommand } from "../types";
 import { resolveUser } from "../../../utils";
 import { sendErrorMessage } from "../../../pluginUtils";
 
-export const ListEventCmd = apexEventsCommand({
+export const ListEventCmd = eventsCommand({
   trigger: "event list",
   permission: null,
   source: "guild",
@@ -14,16 +14,17 @@ export const ListEventCmd = apexEventsCommand({
       return;
     }
 
-    if (pluginData.state.events.length === 0) {
+    const activeAmt = await pluginData.state.guildEvents.activeEventAmount();
+    if (activeAmt === 0) {
       sendErrorMessage(msg.channel, "No active events!");
       return;
     }
 
-    let toSend = `The following ${pluginData.state.events.length} events are currently active:\n`;
+    let toSend = `The following ${activeAmt} events are currently active:\n`;
 
-    for (const evt of pluginData.state.events) {
-      const user = await resolveUser(pluginData.client, evt.author_id);
-      toSend += `${evt.event_id}: \`${evt.event_title}\` by ${user.username}#${user.discriminator}\n`;
+    for (const evt of await pluginData.state.guildEvents.getAll(true)) {
+      const user = await resolveUser(pluginData.client, evt.creator_id);
+      toSend += `${evt.id}: \`${evt.title}\` by ${user.username}#${user.discriminator}\n`;
     }
 
     await msg.channel.createMessage(toSend);
