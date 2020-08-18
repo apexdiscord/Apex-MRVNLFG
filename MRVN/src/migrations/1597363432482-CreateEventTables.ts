@@ -42,10 +42,6 @@ export class CreateEventTables1597363432482 implements MigrationInterface {
             type: "bigint",
           },
           {
-            name: "maxUsers",
-            type: "int",
-          },
-          {
             name: "active",
             type: "boolean",
           },
@@ -53,6 +49,10 @@ export class CreateEventTables1597363432482 implements MigrationInterface {
             name: "open",
             type: "boolean",
           },
+          {
+            name: "vc_visible",
+            type: "boolean",
+          }
         ],
       }),
     );
@@ -74,11 +74,16 @@ export class CreateEventTables1597363432482 implements MigrationInterface {
           },
           {
             name: "event_id",
-            type: "text",
+            type: "integer",
           },
           {
             name: "user_id",
             type: "text",
+          },
+          {
+            name: "request_message_id",
+            type: "text",
+            isNullable: true,
           },
           {
             name: "accepted",

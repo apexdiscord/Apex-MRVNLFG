@@ -20,9 +20,9 @@ export class Event {
 
   @Column() startTime: number;
 
-  @Column() maxUsers: number;
-
   @Column() active: boolean;
 
   @Column() open: boolean;
+
+  @Column() vc_visible: boolean;
 }

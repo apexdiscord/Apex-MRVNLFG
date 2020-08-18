@@ -8,9 +8,11 @@ export class EventParticipant {
 
   @Column() guild_id: string;
 
-  @Column() event_id: string;
+  @Column() event_id: number;
 
   @Column() user_id: string;
+
+  @Column() request_message_id: string;
 
   @Column() accepted: boolean;
 }

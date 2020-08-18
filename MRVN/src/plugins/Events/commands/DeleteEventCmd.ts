@@ -5,6 +5,7 @@ import { eventsCommand } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveUser } from "../../../utils";
+import { logger } from "../../../logger";
 
 export const DeleteEventCmd = eventsCommand({
   trigger: "event delete",
@@ -20,22 +21,23 @@ export const DeleteEventCmd = eventsCommand({
 
   async run({ message: msg, args, pluginData }) {
     const cfg = pluginData.config.get();
-    if (!msg.member.roles.includes(cfg.organizer_role) && getMemberLevel(pluginData, msg.member) < cfg.level_override) {
+    const isMod = getMemberLevel(pluginData, msg.member) >= cfg.level_override;
+    if (!msg.member.roles.includes(cfg.organizer_role) && !isMod) {
       return;
     }
 
-    const evt = await pluginData.state.guildEvents.findByEventId(args.eventId);
+    const evt = await pluginData.state.guildEvents.findByEventId(args.eventId, true);
     if (!evt) {
-      sendErrorMessage(msg.channel, "There is no event with that ID!");
+      sendErrorMessage(msg.channel, "There is no active event with that ID!");
       return;
     }
 
-    if (evt.creator_id !== msg.author.id && getMemberLevel(pluginData, msg.member) < cfg.level_override) {
+    if (evt.creator_id !== msg.author.id && !isMod) {
       sendErrorMessage(msg.channel, "You are not the author of that event!");
       return;
     }
 
-    if (args.full && getMemberLevel(pluginData, msg.member) < cfg.level_override) {
+    if (args.full && !isMod) {
       sendErrorMessage(msg.channel, "You do not have permission to use `-full`!");
       return;
     }
@@ -64,10 +66,12 @@ export const DeleteEventCmd = eventsCommand({
     await pluginData.client.deleteChannel(evt.voice_id, "Event deleted by " + msg.author.id).catch(noop);
 
     let modOverride = "";
-    if (getMemberLevel(pluginData, msg.member) >= cfg.level_override) modOverride = "Moderator override:\n";
+    if (isMod) modOverride = "Moderator override:\n";
     sendSuccessMessage(
       msg.channel,
       modOverride + `Event and channel deleted, message ${args.full ? "deleted" : "edited"}!`,
     );
+    
+    logger.info(`User ${msg.author.id} deleted event ${evt.id} | Moderator: ${isMod}`);
   },
 });

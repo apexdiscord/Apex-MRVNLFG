@@ -22,7 +22,8 @@ export const ListEventCmd = eventsCommand({
 
     let toSend = `The following ${activeAmt} events are currently active:\n`;
 
-    for (const evt of await pluginData.state.guildEvents.getAll(true)) {
+    const activeEvents = await pluginData.state.guildEvents.getAll(true);
+    for (const evt of activeEvents) {
       const user = await resolveUser(pluginData.client, evt.creator_id);
       toSend += `${evt.id}: \`${evt.title}\` by ${user.username}#${user.discriminator}\n`;
     }

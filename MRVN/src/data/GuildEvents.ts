@@ -17,9 +17,9 @@ export class GuildEvents extends BaseGuildRepository {
     title: string,
     description: string,
     startTime: number,
-    maxUsers: number,
     active: boolean,
     open: boolean,
+    vc_visible: boolean,
   ) {
     await this.allEvents.insert({
       guild_id: this.guildId,
@@ -29,9 +29,9 @@ export class GuildEvents extends BaseGuildRepository {
       title,
       description,
       startTime,
-      maxUsers,
       active,
       open,
+      vc_visible,
     });
   }
 
@@ -62,10 +62,11 @@ export class GuildEvents extends BaseGuildRepository {
     return max == null ? 0 : max;
   }
 
-  async findByEventId(id: number): Promise<Event> {
+  async findByEventId(id: number, active: boolean): Promise<Event> {
     return this.allEvents.findOne({
       guild_id: this.guildId,
       id,
+      active,
     });
   }
 
@@ -91,5 +92,22 @@ export class GuildEvents extends BaseGuildRepository {
         active: false,
       },
     );
+  }
+
+  async getEventForAnnounceId(announce_id: string) {
+    return this.allEvents.findOne({
+      guild_id: this.guildId,
+      announce_id,
+      active: true,
+    });
+  }
+
+  async markVcPublic(event_id: number) {
+    await this.allEvents.update({
+      guild_id: this.guildId,
+      id: event_id,
+    }, {
+      vc_visible: true,
+    })
   }
 }

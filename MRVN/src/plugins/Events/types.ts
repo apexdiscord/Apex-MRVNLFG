@@ -18,6 +18,9 @@ export interface EventsPluginType extends BasePluginType {
   state: {
     guildEvents: GuildEvents;
     guildEventParticipants: GuildEventParticipants;
+
+    unloaded: boolean;
+    makeVCVisibleTimeout: NodeJS.Timeout;
   };
 }
 

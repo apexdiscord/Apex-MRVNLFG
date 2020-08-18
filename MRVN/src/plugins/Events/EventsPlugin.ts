@@ -3,10 +3,13 @@ import { GuildEvents } from "../../data/GuildEvents";
 import { GuildEventParticipants } from "../../data/GuildEventParticipants";
 import { EventsPluginType } from "./types";
 import { CreateEventCmd } from "./commands/CreateEventsCmd";
-import { EventReactionAddEvt } from "./events/EventReactionAddEvt";
+import { EventReactionAddOrganizerEvt, EventReactionAddAnnouncementEvt } from "./events/EventReactionAddEvt";
 import { ListEventCmd } from "./commands/ListEventsCmd";
 import { CloseEventCmd } from "./commands/CloseEventCmd";
 import { DeleteEventCmd } from "./commands/DeleteEventCmd";
+import { makeVCVisibleLoop } from "./utils/makeVCVisibleLoop";
+import { ListEventParticipantsCmd } from "./commands/ListEventParticipantsCmd";
+import { EditEventParticipantCmd } from "./commands/EditEventParticipantCmd";
 
 const defaultOptions: PluginOptions<EventsPluginType> = {
   config: {
@@ -28,11 +31,14 @@ export const EventsPlugin = plugin<EventsPluginType>()("events", {
     ListEventCmd,
     CloseEventCmd,
     DeleteEventCmd,
+    ListEventParticipantsCmd,
+    EditEventParticipantCmd,
   ],
 
   // prettier-ignore
   events: [
-    EventReactionAddEvt,
+    EventReactionAddOrganizerEvt,
+    EventReactionAddAnnouncementEvt,
   ],
 
   async onLoad(pluginData) {
@@ -40,5 +46,14 @@ export const EventsPlugin = plugin<EventsPluginType>()("events", {
 
     state.guildEvents = GuildEvents.getGuildInstance(guild.id);
     state.guildEventParticipants = GuildEventParticipants.getGuildInstance(guild.id);
+    state.makeVCVisibleTimeout = null;
+
+    state.unloaded = false;
+    makeVCVisibleLoop(pluginData);
   },
+
+  async onUnload(pluginData) {
+    pluginData.state.unloaded = true;
+    clearTimeout(pluginData.state.makeVCVisibleTimeout);
+  }
 });
