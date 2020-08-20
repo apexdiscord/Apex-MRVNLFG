@@ -14,6 +14,7 @@ import { UtilityPlugin } from "./plugins/Utility/UtilityPlugin";
 import { WherePlugin } from "./plugins/Where/WherePlugin";
 import { logger } from "./logger";
 import { connect } from "./data/db";
+import { EventsPlugin } from "./plugins/Events/EventsPlugin";
 
 require("dotenv").config({ path: path.resolve(process.cwd(), "bot.env") });
 
@@ -36,7 +37,7 @@ connect().then(async () => {
   });
 
   const bot: Knub = new Knub(botClient, {
-    guildPlugins: [LfgPlugin, UtilityPlugin, WherePlugin],
+    guildPlugins: [LfgPlugin, UtilityPlugin, WherePlugin, EventsPlugin],
 
     globalPlugins: [],
 

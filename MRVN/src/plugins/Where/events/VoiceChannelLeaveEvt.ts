@@ -1,6 +1,6 @@
 import { TextableChannel, VoiceChannel } from "eris";
-import { whereEvent } from "../types";
 import moment from "moment-timezone";
+import { whereEvent } from "../types";
 
 export const VoiceChannelLeaveEvt = whereEvent({
   event: "voiceChannelLeave",
