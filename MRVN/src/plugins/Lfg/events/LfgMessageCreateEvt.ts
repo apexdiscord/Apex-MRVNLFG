@@ -64,7 +64,7 @@ export const LfgMessageCreateEvt = lfgEvent({
     // make sure the users voice channel is a valid lfg voice channel
 
     if (cfg.lfg_category_mode) {
-      if (await pluginData.state.categories.getLfgCategory(voice.parentID) == null) {
+      if ((await pluginData.state.categories.getLfgCategory(voice.parentID)) == null) {
         text.createMessage("Sorry, but you have to be in a lfg voice channel! " + requestor.mention);
         logger.info(
           `${requestor.id}: ${requestor.username}#${requestor.discriminator} Stopped LFG request: Not in channel`,

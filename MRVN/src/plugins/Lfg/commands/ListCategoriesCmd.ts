@@ -1,5 +1,5 @@
-import { lfgCommand } from "../types";
 import { createChunkedMessage } from "knub/dist/helpers";
+import { lfgCommand } from "../types";
 import { sendErrorMessage } from "../../../pluginUtils";
 
 export const ListCategoryCmd = lfgCommand({
@@ -14,7 +14,7 @@ export const ListCategoryCmd = lfgCommand({
     }
 
     let all = "The following channels are valid LFG categories:\n";
-    allCategories.forEach(cat => {
+    allCategories.forEach((cat) => {
       all += cat.category_id;
     });
     createChunkedMessage(msg.channel, all);
