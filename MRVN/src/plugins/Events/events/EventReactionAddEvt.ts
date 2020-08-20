@@ -10,7 +10,7 @@ export const EventReactionAddOrganizerEvt = eventsEvent({
   async listener(meta) {
     const pluginData = meta.pluginData;
     const cfg = pluginData.config.get();
-    const msg = await pluginData.client.getMessage(meta.args.message.channel.id, meta.args.message.id) as Message;
+    const msg = (await pluginData.client.getMessage(meta.args.message.channel.id, meta.args.message.id)) as Message;
     const emoji = meta.args.emoji;
     const reactor = await resolveMember(pluginData.client, pluginData.guild, meta.args.userID);
 

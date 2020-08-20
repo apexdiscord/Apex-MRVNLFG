@@ -52,7 +52,7 @@ export class CreateEventTables1597363432482 implements MigrationInterface {
           {
             name: "vc_visible",
             type: "boolean",
-          }
+          },
         ],
       }),
     );

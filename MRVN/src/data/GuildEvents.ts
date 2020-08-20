@@ -103,11 +103,14 @@ export class GuildEvents extends BaseGuildRepository {
   }
 
   async markVcPublic(event_id: number) {
-    await this.allEvents.update({
-      guild_id: this.guildId,
-      id: event_id,
-    }, {
-      vc_visible: true,
-    })
+    await this.allEvents.update(
+      {
+        guild_id: this.guildId,
+        id: event_id,
+      },
+      {
+        vc_visible: true,
+      },
+    );
   }
 }

@@ -1,6 +1,7 @@
-import { GuildChannel, Member, User } from "eris";
+import { GuildChannel, Member, User, CategoryChannel } from "eris";
 import { baseTypeConverters, baseTypeHelpers, CommandContext, TypeConversionError } from "knub";
 import { createTypeHelper } from "knub-command-manager";
+import { resolveChannel } from "knub/dist/helpers";
 import { convertDelayStringToMS, disableCodeBlocks, resolveMember, resolveUser, UnknownUser } from "./utils";
 
 export const commandTypes = {
@@ -42,6 +43,19 @@ export const commandTypes = {
     }
     return result;
   },
+
+  async categoryChannel(value, context: CommandContext<any>) {
+    if (!(context.message.channel instanceof GuildChannel)) return null;
+
+    const result = (await resolveChannel(context.pluginData.guild, value)) as CategoryChannel;
+    if (result == null || result.type !== 4) {
+      throw new TypeConversionError(
+        `The channel \`${disableCodeBlocks(value)}\` is not of type Category or does not exist`,
+      );
+    }
+
+    return result;
+  },
 };
 
 export const commandTypeHelpers = {
@@ -51,4 +65,5 @@ export const commandTypeHelpers = {
   resolvedUser: createTypeHelper<Promise<User>>(commandTypes.resolvedUser),
   resolvedUserLoose: createTypeHelper<Promise<User | UnknownUser>>(commandTypes.resolvedUserLoose),
   resolvedMember: createTypeHelper<Promise<Member | null>>(commandTypes.resolvedMember),
+  categoryChannel: createTypeHelper<Promise<CategoryChannel | null>>(commandTypes.categoryChannel),
 };

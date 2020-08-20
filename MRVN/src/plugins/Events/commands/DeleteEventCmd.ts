@@ -71,7 +71,7 @@ export const DeleteEventCmd = eventsCommand({
       msg.channel,
       modOverride + `Event and channel deleted, message ${args.full ? "deleted" : "edited"}!`,
     );
-    
+
     logger.info(`User ${msg.author.id} deleted event ${evt.id} | Moderator: ${isMod}`);
   },
 });

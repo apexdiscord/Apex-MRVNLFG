@@ -55,5 +55,5 @@ export const EventsPlugin = plugin<EventsPluginType>()("events", {
   async onUnload(pluginData) {
     pluginData.state.unloaded = true;
     clearTimeout(pluginData.state.makeVCVisibleTimeout);
-  }
+  },
 });

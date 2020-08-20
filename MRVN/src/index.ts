@@ -32,7 +32,7 @@ connect().then(async () => {
 
   botClient.on("debug", (message) => {
     if (message.includes(" 429 ")) {
-      logger.info(`[RateLimit] ${message}`);
+      logger.info(`[429] ${message}`);
     }
   });
 
@@ -65,10 +65,6 @@ connect().then(async () => {
       },
     },
   });
-
-  if (!fs.existsSync("./notifications")) {
-    fs.mkdirSync("./notifications");
-  }
 
   logger.info("Starting the bot");
 

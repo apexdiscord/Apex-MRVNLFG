@@ -1,7 +1,7 @@
 import { getRepository, Repository } from "typeorm";
+import { NumberType } from "io-ts";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { EventParticipant } from "./entities/EventParticipant";
-import { NumberType } from "io-ts";
 
 export class GuildEventParticipants extends BaseGuildRepository {
   private allEventParticipants: Repository<EventParticipant>;
@@ -45,19 +45,22 @@ export class GuildEventParticipants extends BaseGuildRepository {
   }
 
   async setAcceptedForEventIdAndUserId(event_id: number, user_id: string, accepted: boolean) {
-    await this.allEventParticipants.update({
-      guild_id: this.guildId,
-      event_id,
-      user_id,
-    }, {
-      accepted,
-    });
+    await this.allEventParticipants.update(
+      {
+        guild_id: this.guildId,
+        event_id,
+        user_id,
+      },
+      {
+        accepted,
+      },
+    );
   }
 
   async getAllForEventId(event_id: number) {
     return this.allEventParticipants.find({
       guild_id: this.guildId,
       event_id,
-    })
+    });
   }
 }

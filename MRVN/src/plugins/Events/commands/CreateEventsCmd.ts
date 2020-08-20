@@ -1,9 +1,9 @@
 import { EmbedOptions, TextableChannel } from "eris";
 import { getMemberLevel } from "knub/dist/helpers";
+import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { eventsCommand } from "../types";
 import { sendSuccessMessage, sendErrorMessage } from "../../../pluginUtils";
-import moment from "moment-timezone";
 import { logger } from "../../../logger";
 
 export const CreateEventCmd = eventsCommand({
@@ -41,7 +41,6 @@ export const CreateEventCmd = eventsCommand({
     embed.footer = { text: "Click 👍 to request to join this event." };
     embed.color = 0x07aeeb;
 
-
     args.startDelay = args.startDelay ? args.startDelay : 0;
     const startTime = moment().utc().add(args.startDelay, "ms");
 
@@ -77,7 +76,16 @@ export const CreateEventCmd = eventsCommand({
       !isInFarFuture,
     );
 
-    sendSuccessMessage(msg.channel, `Event \`${args.title}\` created and posted! \nThe event starts at ${startTime.format("DD-MM-YYYY HH:mm")} UTC.\nThe voice channel will be made visible to everyone an hour in advance.`);
-    logger.info(`User ${msg.author.id} created event ${await pluginData.state.guildEvents.highestEventId()} | Announce Msg: ${announceMsg.id} | Voice Chan: ${voiceChan.id}`);
+    sendSuccessMessage(
+      msg.channel,
+      `Event \`${args.title}\` created and posted! \nThe event starts at ${startTime.format(
+        "DD-MM-YYYY HH:mm",
+      )} UTC.\nThe voice channel will be made visible to everyone an hour in advance.`,
+    );
+    logger.info(
+      `User ${msg.author.id} created event ${await pluginData.state.guildEvents.highestEventId()} | Announce Msg: ${
+        announceMsg.id
+      } | Voice Chan: ${voiceChan.id}`,
+    );
   },
 });

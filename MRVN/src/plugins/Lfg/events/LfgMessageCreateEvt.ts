@@ -48,7 +48,7 @@ export const LfgMessageCreateEvt = lfgEvent({
       return;
     }
 
-    let voice;
+    let voice: VoiceChannel;
     try {
       voice = pluginData.client.getChannel(requestor.voiceState.channelID) as VoiceChannel;
     } catch {
@@ -62,7 +62,16 @@ export const LfgMessageCreateEvt = lfgEvent({
     regex = new RegExp("^([^ß]|[ß])*" + cfg.lfg_voice_ident + "([^ß]|[ß])*$", "i");
 
     // make sure the users voice channel is a valid lfg voice channel
-    if (voice.name.match(regex) == null) {
+
+    if (cfg.lfg_category_mode) {
+      if (await pluginData.state.categories.getLfgCategory(voice.parentID) == null) {
+        text.createMessage("Sorry, but you have to be in a lfg voice channel! " + requestor.mention);
+        logger.info(
+          `${requestor.id}: ${requestor.username}#${requestor.discriminator} Stopped LFG request: Not in channel`,
+        );
+        return;
+      }
+    } else if (voice.name.match(regex) == null) {
       text.createMessage("Sorry, but you have to be in a lfg voice channel! " + requestor.mention);
       logger.info(
         `${requestor.id}: ${requestor.username}#${requestor.discriminator} Stopped LFG request: Not in channel`,

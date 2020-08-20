@@ -1,10 +1,13 @@
 import { PluginOptions, plugin } from "knub";
+import { GuildLfgCategories } from "../../data/GuildLfgCategories";
 import { LfgPluginType } from "./types";
 import { DelayCmd } from "./commands/DelayCmd";
-import { MessageCreateEvt } from "./events/MessageCreateEvt";
 import { VoiceChannelSwitchEvt } from "./events/VoiceChannelSwitchEvt";
 import { VoiceChannelLeaveEvt } from "./events/VoiceChannelLeaveEvt";
 import { LfgMessageCreateEvt } from "./events/LfgMessageCreateEvt";
+import { AddCategoryCmd } from "./commands/AddCategoryCmd";
+import { RemoveCategoryCmd } from "./commands/RemoveCategoryCmd";
+import { ListCategoryCmd } from "./commands/ListCategoriesCmd";
 
 const defaultOptions: PluginOptions<LfgPluginType> = {
   config: {
@@ -12,10 +15,12 @@ const defaultOptions: PluginOptions<LfgPluginType> = {
     lfg_shrink_ident: "!shrink",
     lfg_shrink_default: 2,
     lfg_unshrink_ident: "!unshrink",
-    lfg_voice_ident: "lfg",
-    lfg_text_ident: "lfg",
     lfg_message_compact: true,
     lfg_list_others: true,
+    lfg_text_ident: "lfg",
+
+    lfg_category_mode: false,
+    lfg_voice_ident: "lfg",
 
     lfg_enable_emotes: false,
     lfg_emotes_chan_ident: "ranked",
@@ -30,12 +35,19 @@ const defaultOptions: PluginOptions<LfgPluginType> = {
     lfg_shrink_normal_amt: 3,
 
     can_delay: false,
+    can_manage_categories: false,
   },
   overrides: [
     {
       level: ">=50",
       config: {
         can_delay: true,
+      },
+    },
+    {
+      level: ">=100",
+      config: {
+        can_manage_categories: true,
       },
     },
   ],
@@ -46,8 +58,11 @@ export const LfgPlugin = plugin<LfgPluginType>()("lfg", {
 
   // prettier-ignore
   commands: [
-        DelayCmd,
-    ],
+    DelayCmd,
+    AddCategoryCmd,
+    RemoveCategoryCmd,
+    ListCategoryCmd,
+  ],
 
   // prettier-ignore
   events: [
@@ -58,7 +73,9 @@ export const LfgPlugin = plugin<LfgPluginType>()("lfg", {
   ],
 
   onLoad(pluginData) {
-    const { state } = pluginData;
+    const { state, guild } = pluginData;
+
+    state.categories = GuildLfgCategories.getGuildInstance(guild.id);
 
     state.delay = [];
     state.current_pos = 0;
