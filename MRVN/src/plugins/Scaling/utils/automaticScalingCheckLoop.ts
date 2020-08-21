@@ -6,7 +6,6 @@ import { doAutomaticScaling } from "./doAutomaticScaling";
 const AUTO_SCALING_TIMEOUT = 45 * 1000;
 
 export async function automaticScalingCheckLoop(pluginData: PluginData<ScalingPluginType>) {
-
   const allUnhides = await pluginData.state.scalingUnhides.getAllScalingUnhides();
   for (const unhide of allUnhides) {
     if (unhide.minimum_until <= moment().utc().valueOf()) {
@@ -14,7 +13,7 @@ export async function automaticScalingCheckLoop(pluginData: PluginData<ScalingPl
     }
   }
 
-  if(pluginData.config.get().automatic) {
+  if (pluginData.config.get().automatic) {
     doAutomaticScaling(pluginData);
   }
 

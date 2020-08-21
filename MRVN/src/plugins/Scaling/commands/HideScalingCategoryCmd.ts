@@ -18,15 +18,25 @@ export const HideScalingCategoryCmd = scalingCommand({
       return;
     }
 
-    const everyonePerm = args.category.permissionOverwrites.find(x => x.id === pluginData.guild.id);
+    const everyonePerm = args.category.permissionOverwrites.find((x) => x.id === pluginData.guild.id);
     if ((everyonePerm.deny & pluginData.state.hidePermission) > 0) {
       sendErrorMessage(msg.channel, `Category \`${args.category.name}\` is already hidden`);
       return;
     } else {
       if ((everyonePerm.allow & pluginData.state.hidePermission) > 0) {
-        await args.category.editPermission(pluginData.guild.id, everyonePerm.allow - pluginData.state.hidePermission, everyonePerm.deny + pluginData.state.hidePermission, "role");
+        await args.category.editPermission(
+          pluginData.guild.id,
+          everyonePerm.allow - pluginData.state.hidePermission,
+          everyonePerm.deny + pluginData.state.hidePermission,
+          "role",
+        );
       } else {
-        await args.category.editPermission(pluginData.guild.id, everyonePerm.allow, everyonePerm.deny + pluginData.state.hidePermission, "role");
+        await args.category.editPermission(
+          pluginData.guild.id,
+          everyonePerm.allow,
+          everyonePerm.deny + pluginData.state.hidePermission,
+          "role",
+        );
       }
     }
 
@@ -34,7 +44,7 @@ export const HideScalingCategoryCmd = scalingCommand({
     if (isCategory != null) {
       pluginData.state.scalingUnhides.remove(isCategory.id);
     }
-    
+
     sendSuccessMessage(msg.channel, `Category \`${args.category.name}\` hidden`);
     logger.info(
       `${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} hid Category ${args.category.id}`,
