@@ -15,6 +15,7 @@ import { WherePlugin } from "./plugins/Where/WherePlugin";
 import { logger } from "./logger";
 import { connect } from "./data/db";
 import { EventsPlugin } from "./plugins/Events/EventsPlugin";
+import { ScalingPlugin } from "./plugins/Scaling/ScalingPlugin";
 
 require("dotenv").config({ path: path.resolve(process.cwd(), "bot.env") });
 
@@ -37,7 +38,7 @@ connect().then(async () => {
   });
 
   const bot: Knub = new Knub(botClient, {
-    guildPlugins: [LfgPlugin, UtilityPlugin, WherePlugin, EventsPlugin],
+    guildPlugins: [LfgPlugin, UtilityPlugin, WherePlugin, EventsPlugin, ScalingPlugin],
 
     globalPlugins: [],
 
