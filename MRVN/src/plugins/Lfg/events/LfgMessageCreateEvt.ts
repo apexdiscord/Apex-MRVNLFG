@@ -31,7 +31,7 @@ export const LfgMessageCreateEvt = lfgEvent({
     // check if the message is an actual LFG request
     if (msg.content.match(regex) == null) {
       if (cfg.lfg_enable_shrink) {
-        await unshrinkCommand(meta);
+        await shrinkUnshrinkCommand(meta);
       }
       return;
     }
@@ -132,7 +132,7 @@ export const LfgMessageCreateEvt = lfgEvent({
   },
 });
 
-async function unshrinkCommand(meta) {
+async function shrinkUnshrinkCommand(meta) {
   const pluginData = meta.pluginData;
   const msg = meta.args.message;
   const cfg = meta.pluginData.config.getForMember(msg.member);
@@ -142,8 +142,12 @@ async function unshrinkCommand(meta) {
   let regex = new RegExp("^" + cfg.lfg_shrink_ident + "([^ß]|[ß])*$", "i");
   const msgText = msg.content.split(" ");
   if (msgText[0].match(regex) != null) {
-    let shrinkTo = cfg.lfg_shrink_default;
+    if (requestor.voiceState.channelID == null) {
+      text.createMessage("Sorry, but you have to be in a LFG voice channel to unshrink! " + requestor.mention);
+      return;
+    }
 
+    let shrinkTo = cfg.lfg_shrink_default;
     if (msgText.length > 1) {
       const sizeArg = Number(msgText[1]);
       shrinkTo = cfg.lfg_shrink_shrunk_amts.includes(sizeArg) ? sizeArg : shrinkTo;
@@ -151,22 +155,29 @@ async function unshrinkCommand(meta) {
 
     const voice = pluginData.client.getChannel(requestor.voiceState.channelID) as VoiceChannel;
     regex = new RegExp("^([^ß]|[ß])*" + cfg.lfg_voice_ident + "([^ß]|[ß])*$", "i");
+
     // make sure the users voice channel is a valid lfg voice channel
-    if (voice.name.match(regex) != null) {
-      try {
-        voice.edit({ userLimit: shrinkTo });
-        text.createMessage(
-          `I have shrunk the channel to ${shrinkTo}!\nIf this was not the specified size, it might not be allowed ${requestor.mention}`,
-        );
-        logger.info(
-          `${requestor.id}: ${requestor.username}#${requestor.discriminator} Shrunk channel ${voice.name} | ${voice.id} to ${shrinkTo}`,
-        );
-      } catch (error) {
-        logger.error(`Ran into an error trying to unshrink channel (${voice.id}). Are we missing a permission?`);
-        logger.error(error);
+    if (cfg.lfg_category_mode) {
+      if ((await pluginData.state.categories.getLfgCategory(voice.parentID)) == null) {
+        text.createMessage("Sorry, but you have to be in a LFG voice channel to shrink! " + requestor.mention);
+        return;
       }
-    } else {
+    } else if (voice.name.match(regex) == null) {
       text.createMessage("Sorry, but you have to be in a LFG voice channel to shrink! " + requestor.mention);
+      return;
+    }
+
+    try {
+      voice.edit({ userLimit: shrinkTo });
+      text.createMessage(
+        `I have shrunk the channel to ${shrinkTo}!\nIf this was not the specified size, it might not be allowed ${requestor.mention}`,
+      );
+      logger.info(
+        `${requestor.id}: ${requestor.username}#${requestor.discriminator} Shrunk channel ${voice.name} | ${voice.id} to ${shrinkTo}`,
+      );
+    } catch (error) {
+      logger.error(`Ran into an error trying to unshrink channel (${voice.id}). Are we missing a permission?`);
+      logger.error(error);
     }
 
     try {
@@ -178,25 +189,37 @@ async function unshrinkCommand(meta) {
   } else {
     regex = new RegExp("^" + cfg.lfg_unshrink_ident + "([^ß]|[ß])*$", "i");
     if (msg.content.match(regex) != null) {
+      if (requestor.voiceState.channelID == null) {
+        text.createMessage("Sorry, but you have to be in a LFG voice channel to unshrink! " + requestor.mention);
+        return;
+      }
+
       const voice: VoiceChannel = pluginData.client.getChannel(requestor.voiceState.channelID) as VoiceChannel;
       regex = new RegExp("^([^ß]|[ß])*" + cfg.lfg_voice_ident + "([^ß]|[ß])*$", "i");
-      if (voice.name.match(regex) != null) {
-        if (voice.userLimit !== cfg.lfg_shrink_normal_amt) {
-          try {
-            voice.edit({ userLimit: cfg.lfg_shrink_normal_amt });
-            text.createMessage("I have returned the channel to its normal capacity! " + requestor.mention);
-            logger.info(
-              `${requestor.id}: ${requestor.username}#${requestor.discriminator} Unshrunk channel ${voice.name} | ${voice.id} to ${cfg.lfg_shrink_normal_amt}`,
-            );
-          } catch (error) {
-            logger.error(`Ran into an error trying to unshrink channel (${voice.id}). Are we missing a permission?`);
-            logger.error(error);
-          }
-        } else {
-          text.createMessage("Sorry, but that voice channel is already at normal capacity! " + requestor.mention);
+
+      if (cfg.lfg_category_mode) {
+        if ((await pluginData.state.categories.getLfgCategory(voice.parentID)) == null) {
+          text.createMessage("Sorry, but you have to be in a LFG voice channel to unshrink! " + requestor.mention);
+          return;
+        }
+      } else if (voice.name.match(regex) == null) {
+        text.createMessage("Sorry, but you have to be in a LFG voice channel to unshrink! " + requestor.mention);
+        return;
+      }
+
+      if (voice.userLimit !== cfg.lfg_shrink_normal_amt) {
+        try {
+          voice.edit({ userLimit: cfg.lfg_shrink_normal_amt });
+          text.createMessage("I have returned the channel to its normal capacity! " + requestor.mention);
+          logger.info(
+            `${requestor.id}: ${requestor.username}#${requestor.discriminator} Unshrunk channel ${voice.name} | ${voice.id} to ${cfg.lfg_shrink_normal_amt}`,
+          );
+        } catch (error) {
+          logger.error(`Ran into an error trying to unshrink channel (${voice.id}). Are we missing a permission?`);
+          logger.error(error);
         }
       } else {
-        text.createMessage("Sorry, but you have to be in a LFG voice channel to unshrink! " + requestor.mention);
+        text.createMessage("Sorry, but that voice channel is already at normal capacity! " + requestor.mention);
       }
 
       try {

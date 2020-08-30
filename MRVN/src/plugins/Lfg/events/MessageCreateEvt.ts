@@ -7,6 +7,7 @@ import { handleMessageCreation } from "../utils/handleMessageCreation";
 import { updateDelayTime } from "../utils/updateDelayTime";
 import { logger } from "../../../logger";
 
+// DEPRECATED
 export const MessageCreateEvt = lfgEvent({
   event: "messageCreate",
   allowBots: false,
