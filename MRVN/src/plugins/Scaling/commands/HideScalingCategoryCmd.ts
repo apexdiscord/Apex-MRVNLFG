@@ -2,6 +2,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { logger } from "../../../logger";
 import { sendSuccessMessage, sendErrorMessage } from "../../../pluginUtils";
 import { scalingCommand } from "../types";
+import { doAutomaticScaling } from "../utils/doAutomaticScaling";
 
 export const HideScalingCategoryCmd = scalingCommand({
   trigger: ["scaling hide", "scaling h"],
@@ -45,7 +46,8 @@ export const HideScalingCategoryCmd = scalingCommand({
       pluginData.state.scalingUnhides.remove(isCategory.id);
     }
 
-    sendSuccessMessage(msg.channel, `Category \`${args.category.name}\` hidden`);
+    await doAutomaticScaling(pluginData);
+    sendSuccessMessage(msg.channel, `Category \`${args.category.name}\` unhide cleared`);
     logger.info(
       `${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} hid Category ${args.category.id}`,
     );

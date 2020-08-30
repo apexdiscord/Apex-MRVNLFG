@@ -4,7 +4,6 @@ import { ScalingPluginType } from "../types";
 
 export async function doAutomaticScaling(pluginData: PluginData<ScalingPluginType>) {
   const cfg = pluginData.config.get();
-  const manualUnhides = await pluginData.state.scalingUnhides.getAllScalingUnhides();
   let allScalingCategories = (await pluginData.state.scalingCategories.getAllScalingCategories()).sort(
     (a, b) => a.id - b.id,
   );
@@ -18,17 +17,17 @@ export async function doAutomaticScaling(pluginData: PluginData<ScalingPluginTyp
   const pendingHides = [];
   let pendingUnhide: CategoryChannel = null;
 
-  channels.forEach((ch) => {
+  channels.forEach(async (ch) => {
     if (ChannelType[ch.type] === "VoiceChannel") {
       channelMap.set(ch, ch.parentID);
     } else if (ChannelType[ch.type] === "Category") {
-      if (
-        allScalingCategories.find((x) => x.category_id === ch.id) != null &&
-        manualUnhides.find((x) => x.category_id === ch.id) == null
-      ) {
+      if (allScalingCategories.find((x) => x.category_id === ch.id) != null) {
         categories.push(ch as CategoryChannel);
 
-        const everyonePerm = ch.permissionOverwrites.find((x) => x.id === pluginData.guild.id);
+        let everyonePerm = ch.permissionOverwrites.find((x) => x.id === pluginData.guild.id);
+        if (everyonePerm == null) {
+          everyonePerm = await ch.editPermission(pluginData.guild.id, 0, 0, "role");
+        }
         if ((everyonePerm.deny & pluginData.state.hidePermission) > 0) {
           hiddenCats.push(ch.id);
         }
@@ -72,7 +71,10 @@ export async function doAutomaticScaling(pluginData: PluginData<ScalingPluginTyp
   }
 
   if (pendingUnhide != null) {
-    const everyonePerm = pendingUnhide.permissionOverwrites.find((x) => x.id === pluginData.guild.id);
+    let everyonePerm = pendingUnhide.permissionOverwrites.find((x) => x.id === pluginData.guild.id);
+    if (everyonePerm == null) {
+      everyonePerm = await pendingUnhide.editPermission(pluginData.guild.id, 0, 0, "role");
+    }
     if ((everyonePerm.allow & pluginData.state.hidePermission) <= 0) {
       if ((everyonePerm.deny & pluginData.state.hidePermission) > 0) {
         await pendingUnhide.editPermission(
@@ -103,13 +105,18 @@ export async function doAutomaticScaling(pluginData: PluginData<ScalingPluginTyp
 
     if (hiddenCats.includes(current.category_id)) continue;
     if (catUsagePct.get(current.category_id) > 0) break;
+    if ((await pluginData.state.scalingUnhides.getForCategoryId(current.category_id)) != null) continue;
     if (catUsagePct.get(next.category_id) >= cfg.automatic_unhide_percentage) break;
 
     pendingHides.push(pluginData.client.getChannel(current.category_id) as CategoryChannel);
   }
 
   pendingHides.forEach(async (pend) => {
-    const everyonePerm = pend.permissionOverwrites.find((x) => x.id === pluginData.guild.id);
+    let everyonePerm = pend.permissionOverwrites.find((x) => x.id === pluginData.guild.id);
+    if (everyonePerm == null) {
+      everyonePerm = await pend.editPermission(pluginData.guild.id, 0, 0, "role");
+    }
+    hiddenCats.push(pend.id);
     if ((everyonePerm.deny & pluginData.state.hidePermission) <= 0) {
       if ((everyonePerm.allow & pluginData.state.hidePermission) > 0) {
         await pend.editPermission(
