@@ -22,7 +22,9 @@ export const LfgMessageCreateEvt = lfgEvent({
     const start: any = performance.now();
 
     // check if the text channel is a valid LFG text channel
-    if (!text.name.toLowerCase().includes(cfg.lfg_text_ident.toLowerCase())) {
+    if (cfg.lfg_category_mode) {
+      if ((await pluginData.state.categories.getLfgCategory(text.parentID)) == null) return;
+    } else if (!text.name.toLowerCase().includes(cfg.lfg_text_ident.toLowerCase())) {
       return;
     }
 
