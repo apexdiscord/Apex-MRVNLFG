@@ -6,6 +6,7 @@ import { shrinkChannel } from "../utils/shrinkChannel";
 import { handleMessageCreation } from "../utils/handleMessageCreation";
 import { updateDelayTime } from "../utils/updateDelayTime";
 import { logger } from "../../../logger";
+import { handleVoiceRename } from "../utils/handleVoiceRename";
 
 export const LfgMessageCreateEvt = lfgEvent({
   event: "messageCreate",
@@ -21,7 +22,7 @@ export const LfgMessageCreateEvt = lfgEvent({
     const text = pluginData.client.getChannel(msg.channel.id) as TextChannel;
     const start: any = performance.now();
 
-    // check if the text channel is a valid LFG text channel
+    // check if the text channel is a valid LFG text channel - silently ignore if not
     if (cfg.lfg_category_mode) {
       if ((await pluginData.state.categories.getLfgCategory(text.parentID)) == null) return;
     } else if (!text.name.toLowerCase().includes(cfg.lfg_text_ident.toLowerCase())) {
@@ -125,9 +126,17 @@ export const LfgMessageCreateEvt = lfgEvent({
     await shrinkChannel(voice, userMessage, cfg);
 
     const toPost: any = await handleMessageCreation(pluginData, voice, requestor, userMessage, emotes);
+    // if (cfg.lfg_enable_rename) await handleVoiceRename(pluginData, msg, text, voice);
     msg.channel.createMessage(toPost);
 
     logger.info(`${requestor.id}: ${requestor.username}#${requestor.discriminator} Succesfully completed LFG request`);
+
+    try {
+      await msg.delete("LFG Request");
+    } catch (error) {
+      logger.error(`Failed to delete source message (${msg.id}). It was probably deleted already or we had a timeout`);
+      logger.error(error);
+    }
 
     // add time taken for this command to the delays array so the delay command has up-to-date info
     updateDelayTime(pluginData, start);

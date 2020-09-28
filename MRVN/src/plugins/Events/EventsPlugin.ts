@@ -10,12 +10,14 @@ import { DeleteEventCmd } from "./commands/DeleteEventCmd";
 import { makeVCVisibleLoop } from "./utils/makeVCVisibleLoop";
 import { ListEventParticipantsCmd } from "./commands/ListEventParticipantsCmd";
 import { EditEventParticipantCmd } from "./commands/EditEventParticipantCmd";
+import { ReopenEventCmd } from "./commands/ReopenEventCmd";
 
 const defaultOptions: PluginOptions<EventsPluginType> = {
   config: {
-    organizer_role: "741758286331904031",
+    organiser_role: "741758286331904031",
     level_override: 50,
-    organizer_channel: "741758391655071755",
+    organiser_channel: "741758391655071755",
+    participant_channel: null,
     events_max: 2,
     events_announce_channel: "741758530754707597",
     voice_parent_id: "741775198466080899",
@@ -30,6 +32,7 @@ export const EventsPlugin = plugin<EventsPluginType>()("events", {
     CreateEventCmd,
     ListEventCmd,
     CloseEventCmd,
+    ReopenEventCmd,
     DeleteEventCmd,
     ListEventParticipantsCmd,
     EditEventParticipantCmd,

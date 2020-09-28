@@ -16,6 +16,7 @@ export class GuildEvents extends BaseGuildRepository {
     announce_id: string,
     title: string,
     description: string,
+    accept_info: string,
     startTime: number,
     active: boolean,
     open: boolean,
@@ -28,6 +29,7 @@ export class GuildEvents extends BaseGuildRepository {
       announce_id,
       title,
       description,
+      accept_info,
       startTime,
       active,
       open,
@@ -78,6 +80,18 @@ export class GuildEvents extends BaseGuildRepository {
       },
       {
         open: false,
+      },
+    );
+  }
+
+  async markEventOpen(id: number) {
+    await this.allEvents.update(
+      {
+        guild_id: this.guildId,
+        id,
+      },
+      {
+        open: true,
       },
     );
   }

@@ -16,14 +16,6 @@ export const WhereCmd = whereCommand({
 
   async run({ message: msg, args, pluginData }) {
     const vcs: VoiceChannel[] = [];
-    for (let i = 0; i < 20; i++) {
-      vcs.push(await pluginData.client.createChannel(pluginData.guild.id, "VC " + i, 2));
-    }
-
-    for (let i = 0; i < 20; i++) {
-      vcs[i].delete();
-    }
-
     let member: Member;
     if (!(args.user instanceof UnknownUser)) {
       member = await resolveMember(pluginData.client, pluginData.guild, args.user.id);

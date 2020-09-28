@@ -18,6 +18,8 @@ export class Event {
 
   @Column() description: string;
 
+  @Column() accept_info: string;
+
   @Column() startTime: number;
 
   @Column() active: boolean;

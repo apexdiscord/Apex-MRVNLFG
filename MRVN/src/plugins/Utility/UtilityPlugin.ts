@@ -39,21 +39,21 @@ export const UtilityPlugin = plugin<UtilityPluginType>()("utility", {
 
   // prettier-ignore
   commands: [
-        PingCmd,
-        LevelCmd,
-        UptimeCmd,
-        VersionCmd,
-    ],
+    PingCmd,
+    LevelCmd,
+    UptimeCmd,
+    VersionCmd,
+  ],
 
   // prettier-ignore
   events: [
-        DmMessageCreateEvt,
-    ],
+    DmMessageCreateEvt,
+  ],
 
   onLoad(pluginData) {
     const { state } = pluginData;
 
-    state.VERSION = "1.0.5";
+    state.VERSION = "1.1.2";
     state.NEWEST_VERSION = state.VERSION;
     state.NEW_AVAILABLE = false;
 

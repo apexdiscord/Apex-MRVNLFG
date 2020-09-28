@@ -9,6 +9,7 @@ export const AddCategoryCmd = lfgCommand({
 
   signature: {
     category: ct.categoryChannel(),
+    ranked: ct.switchOption({ shortcut: "r" }),
   },
 
   async run({ message: msg, args, pluginData }) {
@@ -18,7 +19,8 @@ export const AddCategoryCmd = lfgCommand({
       return;
     }
 
-    pluginData.state.categories.add(args.category.id);
+    const ranked = args.ranked ? args.ranked : false;
+    pluginData.state.categories.add(args.category.id, ranked);
     sendSuccessMessage(msg.channel, `Category \`${args.category.name}\` added to LFG categories`);
     logger.info(
       `${msg.author.id}: ${msg.author.username}#${msg.author.discriminator} added a new Category ${args.category.id} to LFG Categories`,

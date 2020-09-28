@@ -31,6 +31,8 @@ connect().then(async () => {
     intents: ["guildMessages", "directMessages", "guilds", "guildBans", "guildVoiceStates", "guildMessageReactions"],
   });
 
+  botClient.setMaxListeners(100);
+
   botClient.on("debug", (message) => {
     if (message.includes(" 429 ")) {
       logger.info(`[429] ${message}`);

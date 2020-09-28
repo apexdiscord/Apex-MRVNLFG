@@ -15,15 +15,16 @@ export const CreateEventCmd = eventsCommand({
     title: ct.string(),
     description: ct.string({ catchAll: true }),
 
+    acceptInfo: ct.string({ option: true, shortcut: "a" }),
     startDelay: ct.delay({ option: true, shortcut: "s" }),
   },
 
   async run({ message: msg, args, pluginData }) {
     const cfg = pluginData.config.get();
-    if (!msg.member.roles.includes(cfg.organizer_role) && getMemberLevel(pluginData, msg.member) < cfg.level_override) {
+    if (!msg.member.roles.includes(cfg.organiser_role) && getMemberLevel(pluginData, msg.member) < cfg.level_override) {
       return;
     }
-    if (!(msg.channel.id === cfg.organizer_channel)) return;
+    if (!(msg.channel.id === cfg.organiser_channel)) return;
 
     if ((await pluginData.state.guildEvents.activeEventAmount()) >= cfg.events_max) {
       sendErrorMessage(msg.channel, "Sorry, but the maximum amount of events is " + cfg.events_max);
@@ -48,18 +49,25 @@ export const CreateEventCmd = eventsCommand({
 
     const everyoneDeny = isInFarFuture ? 1049600 : 1048576;
 
-    const voiceChan = await pluginData.guild.createChannel(
-      "" + ((await pluginData.state.guildEvents.highestEventId()) + 1),
-      2,
-      "Create event vocie channel",
-      {
-        parentID: cfg.voice_parent_id,
-        permissionOverwrites: [
-          { type: "role", id: pluginData.guild.id, allow: 0, deny: everyoneDeny },
-          { type: "role", id: cfg.organizer_role, allow: 1049600, deny: 0 },
-        ],
-      },
-    );
+    let voiceChan;
+    try {
+      voiceChan = await pluginData.guild.createChannel(
+        "" + ((await pluginData.state.guildEvents.highestEventId()) + 1),
+        2,
+        "Create event vocie channel",
+        {
+          parentID: cfg.voice_parent_id,
+          permissionOverwrites: [
+            { type: "role", id: pluginData.guild.id, allow: 0, deny: everyoneDeny },
+            { type: "role", id: cfg.organiser_role, allow: 1049600, deny: 0 },
+            { type: "member", id: pluginData.client.user.id, allow: 269544528, deny: 0 },
+          ],
+        },
+      );
+    } catch (e) {
+      sendErrorMessage(msg.channel, `Error, we might be missing permissions! E: ${e}`);
+      return;
+    }
 
     const announceMsg = await announceChan.createMessage({ embed });
     announceMsg.addReaction("👍");
@@ -70,6 +78,7 @@ export const CreateEventCmd = eventsCommand({
       announceMsg.id,
       args.title,
       args.description,
+      args.acceptInfo,
       startTime.valueOf(),
       true,
       true,

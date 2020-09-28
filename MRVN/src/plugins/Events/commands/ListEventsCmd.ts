@@ -10,7 +10,7 @@ export const ListEventCmd = eventsCommand({
 
   async run({ message: msg, pluginData }) {
     const cfg = pluginData.config.get();
-    if (!msg.member.roles.includes(cfg.organizer_role) && getMemberLevel(pluginData, msg.member) < cfg.level_override) {
+    if (!msg.member.roles.includes(cfg.organiser_role) && getMemberLevel(pluginData, msg.member) < cfg.level_override) {
       return;
     }
 

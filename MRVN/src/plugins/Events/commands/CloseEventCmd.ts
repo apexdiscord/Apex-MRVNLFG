@@ -18,7 +18,7 @@ export const CloseEventCmd = eventsCommand({
   async run({ message: msg, args, pluginData }) {
     const cfg = pluginData.config.get();
     const isMod = getMemberLevel(pluginData, msg.member) >= cfg.level_override;
-    if (!msg.member.roles.includes(cfg.organizer_role) && !isMod) {
+    if (!msg.member.roles.includes(cfg.organiser_role) && !isMod) {
       return;
     }
 
@@ -33,7 +33,7 @@ export const CloseEventCmd = eventsCommand({
       return;
     }
 
-    pluginData.state.guildEvents.markEventClosed(evt.id);
+    await pluginData.state.guildEvents.markEventClosed(evt.id);
 
     const author = (await resolveUser(pluginData.client, evt.creator_id)) as User;
     const embed: EmbedOptions = {

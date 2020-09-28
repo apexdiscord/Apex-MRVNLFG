@@ -30,9 +30,12 @@ const defaultOptions: PluginOptions<LfgPluginType> = {
     lfg_emotes_notfound_append: "\n**No ranks in this message**",
 
     lfg_enable_shrink: false,
-    lfg_shrink_text_idents: ["duo", "1v1", "solo"],
-    lfg_shrink_shrunk_amts: [2, 2, 1],
+    lfg_shrink_text_idents: ["duo", "1v1"],
+    lfg_shrink_shrunk_amts: [2, 2],
     lfg_shrink_normal_amt: 3,
+
+    lfg_enable_rename: false,
+    lfg_voice_rename_template: "**** {lnk.region} {ctx.rank}",
 
     can_delay: false,
     can_manage_categories: false,

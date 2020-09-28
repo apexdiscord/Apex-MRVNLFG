@@ -26,6 +26,9 @@ export const ConfigSchema = t.type({
   lfg_shrink_shrunk_amts: t.array(t.number),
   lfg_shrink_normal_amt: t.number,
 
+  lfg_enable_rename: t.boolean,
+  lfg_voice_rename_template: t.string,
+
   can_delay: t.boolean,
   can_manage_categories: t.boolean,
 });

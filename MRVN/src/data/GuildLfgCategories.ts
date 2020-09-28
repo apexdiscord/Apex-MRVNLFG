@@ -10,10 +10,11 @@ export class GuildLfgCategories extends BaseGuildRepository {
     this.allLfgCategories = getRepository(LfgCategory);
   }
 
-  async add(category_id: string) {
+  async add(category_id: string, ranked: boolean = false) {
     await this.allLfgCategories.insert({
       guild_id: this.guildId,
       category_id,
+      ranked,
     });
   }
 
@@ -34,6 +35,14 @@ export class GuildLfgCategories extends BaseGuildRepository {
   async getAllLfgCategories() {
     return this.allLfgCategories.find({
       guild_id: this.guildId,
+    });
+  }
+
+  async getRankedCategory(category_id: string) {
+    return this.allLfgCategories.findOne({
+      guild_id: this.guildId,
+      category_id,
+      ranked: true,
     });
   }
 }

@@ -1,21 +1,21 @@
 import fs from "fs";
-import { onlyDM } from "knub/dist/events/eventFilters";
+import { ignoreBots, onlyDM } from "knub/dist/events/eventFilters";
 import moment from "moment-timezone";
+import { noop } from "knub/dist/utils";
 import { utilityEvent } from "../types";
 import { logger } from "../../../logger";
 
 export const DmMessageCreateEvt = utilityEvent({
   event: "messageCreate",
-  allowBots: false,
   allowOutsideOfGuild: true,
-  filters: [onlyDM()],
+  filters: [onlyDM(), ignoreBots()],
 
   async listener(meta) {
     const msg = meta.args.message;
     logger.log(`${msg.author.id} said the following in DMs: ${msg.cleanContent}`);
 
     const cfg = meta.pluginData.config.getForUser(msg.author);
-    msg.channel.createMessage(cfg.dm_response);
+    msg.channel.createMessage(cfg.dm_response).catch(noop);
 
     fs.appendFile(
       "DMMessages.txt",

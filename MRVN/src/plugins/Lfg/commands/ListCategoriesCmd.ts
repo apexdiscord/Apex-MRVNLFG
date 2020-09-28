@@ -15,7 +15,7 @@ export const ListCategoryCmd = lfgCommand({
 
     let all = "The following channels are valid LFG categories:\n";
     allCategories.forEach((cat) => {
-      all += cat.category_id + "\n";
+      all += `${cat.category_id} Ranked: ${cat.ranked.valueOf()}\n`;
     });
     createChunkedMessage(msg.channel, all.trim());
   },

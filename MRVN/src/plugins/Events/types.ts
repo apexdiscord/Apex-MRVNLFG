@@ -4,9 +4,10 @@ import { GuildEvents } from "src/data/GuildEvents";
 import { GuildEventParticipants } from "src/data/GuildEventParticipants";
 
 export const ConfigSchema = t.type({
-  organizer_role: t.string,
+  organiser_role: t.string,
   level_override: t.number,
-  organizer_channel: t.string,
+  organiser_channel: t.string,
+  participant_channel: t.string,
   events_max: t.number,
   events_announce_channel: t.string,
   voice_parent_id: t.string,

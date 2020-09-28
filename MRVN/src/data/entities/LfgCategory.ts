@@ -9,4 +9,6 @@ export class LfgCategory {
   @Column() guild_id: string;
 
   @Column() category_id: string;
+
+  @Column() ranked: boolean;
 }

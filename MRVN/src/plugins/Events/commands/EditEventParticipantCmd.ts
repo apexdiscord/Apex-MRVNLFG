@@ -21,7 +21,7 @@ export const EditEventParticipantCmd = eventsCommand({
   async run({ message: msg, args, pluginData }) {
     const cfg = pluginData.config.get();
     const isMod = getMemberLevel(pluginData, msg.member) >= cfg.level_override;
-    if (!msg.member.roles.includes(cfg.organizer_role) && !isMod) {
+    if (!msg.member.roles.includes(cfg.organiser_role) && !isMod) {
       return;
     }
 
