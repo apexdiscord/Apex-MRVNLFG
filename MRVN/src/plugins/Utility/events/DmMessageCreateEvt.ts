@@ -7,7 +7,6 @@ import { logger } from "../../../logger";
 
 export const DmMessageCreateEvt = utilityEvent({
   event: "messageCreate",
-  allowOutsideOfGuild: true,
   filters: [onlyDM(), ignoreBots()],
 
   async listener(meta) {

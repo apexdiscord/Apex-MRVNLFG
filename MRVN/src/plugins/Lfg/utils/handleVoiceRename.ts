@@ -1,9 +1,9 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { Message, VoiceChannel, GuildChannel } from "eris";
 import { LfgPluginType } from "../types";
 
 export async function handleVoiceRename(
-  pluginData: PluginData<LfgPluginType>,
+  pluginData: GuildPluginData<LfgPluginType>,
   msg: Message,
   text: GuildChannel,
   voice: VoiceChannel,

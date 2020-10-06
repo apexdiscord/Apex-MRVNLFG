@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, command, eventListener } from "knub";
+import { BasePluginType, guildCommand, guildEventListener } from "knub";
 import { GuildNotifyRequests } from "../../data/GuildNotifyRequests";
 
 export const ConfigSchema = t.type({
@@ -21,5 +21,5 @@ export interface WherePluginType extends BasePluginType {
   };
 }
 
-export const whereCommand = command<WherePluginType>();
-export const whereEvent = eventListener<WherePluginType>();
+export const whereCommand = guildCommand<WherePluginType>();
+export const whereEvent = guildEventListener<WherePluginType>();

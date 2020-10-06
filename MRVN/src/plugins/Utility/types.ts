@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, command, eventListener } from "knub";
+import { BasePluginType, guildCommand, guildEventListener } from "knub";
 
 export const ConfigSchema = t.type({
   can_ping: t.boolean,
@@ -15,5 +15,5 @@ export interface UtilityPluginType extends BasePluginType {
   config: TConfigSchema;
 }
 
-export const utilityCommand = command<UtilityPluginType>();
-export const utilityEvent = eventListener<UtilityPluginType>();
+export const utilityCommand = guildCommand<UtilityPluginType>();
+export const utilityEvent = guildEventListener<UtilityPluginType>();

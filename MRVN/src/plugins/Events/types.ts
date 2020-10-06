@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, command, eventListener } from "knub";
+import { BasePluginType, guildCommand, guildEventListener } from "knub";
 import { GuildEvents } from "src/data/GuildEvents";
 import { GuildEventParticipants } from "src/data/GuildEventParticipants";
 
@@ -25,5 +25,5 @@ export interface EventsPluginType extends BasePluginType {
   };
 }
 
-export const eventsCommand = command<EventsPluginType>();
-export const eventsEvent = eventListener<EventsPluginType>();
+export const eventsCommand = guildCommand<EventsPluginType>();
+export const eventsEvent = guildEventListener<EventsPluginType>();

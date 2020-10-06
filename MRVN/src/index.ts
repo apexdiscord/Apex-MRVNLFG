@@ -64,7 +64,7 @@ connect().then(async () => {
       logFn: (level, msg) => {
         if (level === "debug") return;
         // eslint-disable-next-line no-console
-        console.log(`[${level.toUpperCase()}] [${moment().toISOString()}] ${msg}`);
+        console.log(`[KNB] [${moment.utc().toISOString()}] ${msg}`);
       },
     },
   });

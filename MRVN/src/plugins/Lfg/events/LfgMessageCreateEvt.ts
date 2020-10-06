@@ -1,17 +1,18 @@
 import { performance } from "perf_hooks";
 import { TextChannel, VoiceChannel } from "eris";
+import { onlyGuild } from "knub/dist/events/eventFilters";
 import { lfgEvent } from "../types";
 import { passesFilter } from "../../../blockedWords";
 import { shrinkChannel } from "../utils/shrinkChannel";
 import { handleMessageCreation } from "../utils/handleMessageCreation";
 import { updateDelayTime } from "../utils/updateDelayTime";
 import { logger } from "../../../logger";
-import { handleVoiceRename } from "../utils/handleVoiceRename";
+import { renameChannel } from "../utils/renameChannel";
 
 export const LfgMessageCreateEvt = lfgEvent({
   event: "messageCreate",
   allowBots: false,
-  allowOutsideOfGuild: false,
+  filters: [onlyGuild()],
 
   async listener(meta) {
     const pluginData = meta.pluginData;
@@ -24,7 +25,7 @@ export const LfgMessageCreateEvt = lfgEvent({
 
     // check if the text channel is a valid LFG text channel - silently ignore if not
     if (cfg.lfg_category_mode) {
-      if ((await pluginData.state.categories.getLfgCategory(text.parentID)) == null) return;
+      if ((await pluginData.state.categories.getLfgCategory(text.parentID)) === null) return;
     } else if (!text.name.toLowerCase().includes(cfg.lfg_text_ident.toLowerCase())) {
       return;
     }
@@ -124,10 +125,12 @@ export const LfgMessageCreateEvt = lfgEvent({
     }
 
     await shrinkChannel(voice, userMessage, cfg);
+    // Ill make this configurable in the future, just need this out the door rn
+    const renameAppend = msg.guildID === "541484311354933258" ? await renameChannel(voice, msg, pluginData) : "";
 
     const toPost: any = await handleMessageCreation(pluginData, voice, requestor, userMessage, emotes);
     // if (cfg.lfg_enable_rename) await handleVoiceRename(pluginData, msg, text, voice);
-    msg.channel.createMessage(toPost);
+    msg.channel.createMessage(toPost + renameAppend);
 
     logger.info(`${requestor.id}: ${requestor.username}#${requestor.discriminator} Succesfully completed LFG request`);
 

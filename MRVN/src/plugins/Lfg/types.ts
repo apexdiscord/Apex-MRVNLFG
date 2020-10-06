@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, command, eventListener } from "knub";
+import { BasePluginType, guildCommand, guildEventListener } from "knub";
 import { GuildLfgCategories } from "src/data/GuildLfgCategories";
 
 export const ConfigSchema = t.type({
@@ -41,8 +41,9 @@ export interface LfgPluginType extends BasePluginType {
 
     delay: number[];
     current_pos: number;
+    rename_cooldowns: Map<string, number>;
   };
 }
 
-export const lfgCommand = command<LfgPluginType>();
-export const lfgEvent = eventListener<LfgPluginType>();
+export const lfgCommand = guildCommand<LfgPluginType>();
+export const lfgEvent = guildEventListener<LfgPluginType>();

@@ -1,11 +1,11 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { getInviteLink } from "knub/dist/helpers";
 import Eris, { VoiceChannel, Member } from "eris";
 import { LfgPluginType } from "../types";
 import { createOrReuseInvite } from "./createOrReuseInvite";
 
 export async function handleMessageCreation(
-  pluginData: PluginData<LfgPluginType>,
+  pluginData: GuildPluginData<LfgPluginType>,
   vc: VoiceChannel,
   member: Member,
   message: string,

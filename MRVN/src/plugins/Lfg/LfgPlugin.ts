@@ -1,4 +1,4 @@
-import { PluginOptions, plugin } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { GuildLfgCategories } from "../../data/GuildLfgCategories";
 import { LfgPluginType } from "./types";
 import { DelayCmd } from "./commands/DelayCmd";
@@ -56,7 +56,7 @@ const defaultOptions: PluginOptions<LfgPluginType> = {
   ],
 };
 
-export const LfgPlugin = plugin<LfgPluginType>()("lfg", {
+export const LfgPlugin = guildPlugin<LfgPluginType>()("lfg", {
   defaultOptions,
 
   // prettier-ignore
@@ -82,5 +82,6 @@ export const LfgPlugin = plugin<LfgPluginType>()("lfg", {
 
     state.delay = [];
     state.current_pos = 0;
+    state.rename_cooldowns = new Map<string, number>();
   },
 });

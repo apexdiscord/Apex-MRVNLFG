@@ -1,4 +1,4 @@
-import { PluginOptions, plugin } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { GuildEvents } from "../../data/GuildEvents";
 import { GuildEventParticipants } from "../../data/GuildEventParticipants";
 import { EventsPluginType } from "./types";
@@ -24,7 +24,7 @@ const defaultOptions: PluginOptions<EventsPluginType> = {
   },
 };
 
-export const EventsPlugin = plugin<EventsPluginType>()("events", {
+export const EventsPlugin = guildPlugin<EventsPluginType>()("events", {
   defaultOptions,
 
   // prettier-ignore

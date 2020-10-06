@@ -1,5 +1,6 @@
 import { performance } from "perf_hooks";
 import { TextChannel, VoiceChannel } from "eris";
+import { onlyGuild } from "knub/dist/events/eventFilters";
 import { lfgEvent } from "../types";
 import { passesFilter } from "../../../blockedWords";
 import { shrinkChannel } from "../utils/shrinkChannel";
@@ -11,7 +12,7 @@ import { logger } from "../../../logger";
 export const MessageCreateEvt = lfgEvent({
   event: "messageCreate",
   allowBots: false,
-  allowOutsideOfGuild: false,
+  filters: [onlyGuild()],
 
   async listener(meta) {
     const pluginData = meta.pluginData;

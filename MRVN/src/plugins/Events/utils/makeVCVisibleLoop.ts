@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { VoiceChannel } from "eris";
 import { EventsPluginType } from "../types";
@@ -6,7 +6,7 @@ import { logger } from "../../../logger";
 
 const VC_VISIBLE_TIMEOUT = 30 * 1000;
 
-export async function makeVCVisibleLoop(pluginData: PluginData<EventsPluginType>) {
+export async function makeVCVisibleLoop(pluginData: GuildPluginData<EventsPluginType>) {
   const activeEvents = await pluginData.state.guildEvents.getAll(true);
 
   activeEvents.forEach((evt) => {

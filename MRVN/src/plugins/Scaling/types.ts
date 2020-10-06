@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, command, eventListener } from "knub";
+import { BasePluginType, guildCommand, guildEventListener } from "knub";
 import { GuildScalingCategories } from "../../data/GuildScalingCategories";
 import { GuildScalingUnhides } from "../../data/GuildScalingUnhides";
 
@@ -27,5 +27,5 @@ export interface ScalingPluginType extends BasePluginType {
   };
 }
 
-export const scalingCommand = command<ScalingPluginType>();
-export const scalingEvent = eventListener<ScalingPluginType>();
+export const scalingCommand = guildCommand<ScalingPluginType>();
+export const scalingEvent = guildEventListener<ScalingPluginType>();

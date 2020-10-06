@@ -1,4 +1,4 @@
-import { PluginOptions, plugin } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { GuildScalingCategories } from "../../data/GuildScalingCategories";
 import { GuildScalingUnhides } from "../../data/GuildScalingUnhides";
 import { automaticScalingCheckLoop } from "./utils/automaticScalingCheckLoop";
@@ -39,7 +39,7 @@ const defaultOptions: PluginOptions<ScalingPluginType> = {
   ],
 };
 
-export const ScalingPlugin = plugin<ScalingPluginType>()("scaling", {
+export const ScalingPlugin = guildPlugin<ScalingPluginType>()("scaling", {
   defaultOptions,
 
   // prettier-ignore

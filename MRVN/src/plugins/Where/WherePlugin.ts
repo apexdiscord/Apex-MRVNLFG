@@ -1,4 +1,4 @@
-import { PluginOptions, plugin } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { GuildNotifyRequests } from "../../data/GuildNotifyRequests";
 import { WherePluginType } from "./types";
 import { WhereCmd } from "./commands/WhereCmd";
@@ -34,7 +34,7 @@ const defaultOptions: PluginOptions<WherePluginType> = {
   ],
 };
 
-export const WherePlugin = plugin<WherePluginType>()("where", {
+export const WherePlugin = guildPlugin<WherePluginType>()("where", {
   defaultOptions,
 
   // prettier-ignore

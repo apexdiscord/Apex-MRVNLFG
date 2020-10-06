@@ -1,4 +1,4 @@
-import { PluginOptions, plugin } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { UtilityPluginType } from "./types";
 import { updateLoop } from "./utils/updateLoop";
 import { PingCmd } from "./commands/PingCmd";
@@ -34,7 +34,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
   ],
 };
 
-export const UtilityPlugin = plugin<UtilityPluginType>()("utility", {
+export const UtilityPlugin = guildPlugin<UtilityPluginType>()("utility", {
   defaultOptions,
 
   // prettier-ignore
@@ -53,7 +53,7 @@ export const UtilityPlugin = plugin<UtilityPluginType>()("utility", {
   onLoad(pluginData) {
     const { state } = pluginData;
 
-    state.VERSION = "1.1.2";
+    state.VERSION = "1.1.3";
     state.NEWEST_VERSION = state.VERSION;
     state.NEW_AVAILABLE = false;
 

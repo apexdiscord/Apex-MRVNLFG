@@ -1,8 +1,8 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { Collection, AnyGuildChannel, VoiceChannel, CategoryChannel } from "eris";
 import { ScalingPluginType } from "../types";
 
-export async function doAutomaticScaling(pluginData: PluginData<ScalingPluginType>) {
+export async function doAutomaticScaling(pluginData: GuildPluginData<ScalingPluginType>) {
   const cfg = pluginData.config.get();
   let allScalingCategories = (await pluginData.state.scalingCategories.getAllScalingCategories()).sort(
     (a, b) => a.id - b.id,
