@@ -29,11 +29,11 @@ export async function renameChannel(
   const textChannel = userMessage.channel as GuildChannel;
   let catIdent: LfgRegion;
   switch (textChannel.parentID) {
-    case "746154922109698129": // NA
+    case "542415274544988182": // NA
       catIdent = LfgRegion.NA;
       break;
 
-    case "551767166395875332": // EU
+    case "542415434599628801": // EU
       catIdent = LfgRegion.EU;
       break;
 

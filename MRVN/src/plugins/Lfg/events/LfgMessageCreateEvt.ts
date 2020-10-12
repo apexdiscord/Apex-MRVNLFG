@@ -112,7 +112,8 @@ export const LfgMessageCreateEvt = lfgEvent({
 
     let emotes: boolean = false;
     if (cfg.lfg_enable_emotes) {
-      emotes = text.name.includes(cfg.lfg_emotes_chan_ident);
+      const rankedCat = await pluginData.state.categories.getRankedCategory(text.parentID);
+      emotes = text.name.includes(cfg.lfg_emotes_chan_ident) || rankedCat != null;
     }
 
     try {

@@ -31,7 +31,7 @@
     "humanize-duration": "^3.22.0",
     "io-ts": "^2.2.7",
     "js-yaml": "^3.13.1",
-    "knub": "^30.0.0-beta.23",
+    "knub": "^30.0.0-beta.25",
     "moment-timezone": "^0.5.28",
     "reflect-metadata": "^0.1.13",
     "typeorm": "^0.3.0-alpha.24",
