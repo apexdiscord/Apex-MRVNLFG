@@ -13,11 +13,12 @@ export const EventReactionAddOrganizerEvt = eventsEvent({
     const cfg = pluginData.config.get();
     const msg = (await pluginData.client.getMessage(meta.args.message.channel.id, meta.args.message.id)) as Message;
     const emoji = meta.args.emoji;
-    const reactor = await resolveMember(pluginData.client, pluginData.guild, meta.args.userID);
 
     if (msg.channel.id !== cfg.organiser_channel && msg.channel.id !== cfg.participant_channel) {
       return;
     }
+
+    const reactor = await resolveMember(pluginData.client, pluginData.guild, meta.args.member.id);
 
     const participant = await pluginData.state.guildEventParticipants.getByRequestId(msg.id);
     if (participant == null || participant.accepted != null) return;
@@ -79,7 +80,6 @@ export const EventReactionAddAnnouncementEvt = eventsEvent({
     const cfg = pluginData.config.get();
     const msg = meta.args.message as Message;
     const emoji = meta.args.emoji;
-    const reactor = await resolveMember(pluginData.client, pluginData.guild, meta.args.userID);
 
     if (emoji.name !== "👍") {
       return;
@@ -87,6 +87,8 @@ export const EventReactionAddAnnouncementEvt = eventsEvent({
     if (msg.channel.id !== cfg.events_announce_channel) {
       return;
     }
+
+    const reactor = await resolveMember(pluginData.client, pluginData.guild, meta.args.member.id);
 
     const event = await pluginData.state.guildEvents.getEventForAnnounceId(msg.id);
     if (!event) return;

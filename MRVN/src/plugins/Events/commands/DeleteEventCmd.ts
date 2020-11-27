@@ -58,15 +58,29 @@ export const DeleteEventCmd = eventsCommand({
     const evtMsg = await pluginData.client.getMessage(cfg.events_announce_channel, evt.announce_id);
     if (evtMsg && !args.full) {
       await evtMsg.edit({ embed });
-      await evtMsg.removeReactions();
+      await evtMsg.removeReactions().catch((e) => {
+        sendErrorMessage(msg.channel, `Error deleting all reactions on announcement: ${e}`);
+      });
     } else if (evtMsg) {
-      await evtMsg.delete(`Event fully deleted by moderator ${msg.author.id} with reason ${args.message}`);
+      await evtMsg
+        .delete(`Event fully deleted by moderator ${msg.author.id} with reason ${args.message}`)
+        .catch((e) => {
+          sendErrorMessage(msg.channel, `Error deleting announcement: ${e}`);
+        });
     }
 
     try {
       await pluginData.client.deleteChannel(evt.voice_id, "Event deleted by " + msg.author.id);
     } catch (e) {
       sendErrorMessage(msg.channel, `Error deleting voice channel: ${e}`);
+    }
+
+    try {
+      if (evt.ping_message_id != null) {
+        await pluginData.client.deleteMessage(cfg.events_announce_channel, evt.ping_message_id);
+      }
+    } catch (e) {
+      sendErrorMessage(msg.channel, `Error deleting 1h ping message: ${e}`);
     }
 
     let modOverride = "";

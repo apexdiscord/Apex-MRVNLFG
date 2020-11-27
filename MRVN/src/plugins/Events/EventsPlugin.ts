@@ -15,6 +15,8 @@ import { ReopenEventCmd } from "./commands/ReopenEventCmd";
 const defaultOptions: PluginOptions<EventsPluginType> = {
   config: {
     organiser_role: "741758286331904031",
+    moderator_role: "542793364722941972",
+    ping_role: "",
     level_override: 50,
     organiser_channel: "741758391655071755",
     participant_channel: null,

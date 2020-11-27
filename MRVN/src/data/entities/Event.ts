@@ -14,6 +14,8 @@ export class Event {
 
   @Column() announce_id: string;
 
+  @Column() ping_message_id: string;
+
   @Column() title: string;
 
   @Column() description: string;

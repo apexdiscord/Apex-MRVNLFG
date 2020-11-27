@@ -127,4 +127,16 @@ export class GuildEvents extends BaseGuildRepository {
       },
     );
   }
+
+  async setPingMsgId(event_id: number, ping_message_id: string) {
+    await this.allEvents.update(
+      {
+        guild_id: this.guildId,
+        id: event_id,
+      },
+      {
+        ping_message_id,
+      },
+    );
+  }
 }

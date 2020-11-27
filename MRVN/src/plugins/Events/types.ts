@@ -5,6 +5,8 @@ import { GuildEventParticipants } from "src/data/GuildEventParticipants";
 
 export const ConfigSchema = t.type({
   organiser_role: t.string,
+  moderator_role: t.string,
+  ping_role: t.string,
   level_override: t.number,
   organiser_channel: t.string,
   participant_channel: t.string,

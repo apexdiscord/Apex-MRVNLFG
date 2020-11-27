@@ -42,7 +42,10 @@ export const VoiceUsageCmd = whereCommand({
         }
       });
 
-      reply += `\n__${cat.name}__: **${freeAmt}** of **${catChannels.length}** free`;
+      reply += `\n__${cat.name}__: **${freeAmt}** of **${catChannels.length}** free (${(
+        ((catChannels.length - freeAmt) / catChannels.length) *
+        100
+      ).toFixed(2)}% Used)`;
     }
 
     msg.channel.createMessage(reply);

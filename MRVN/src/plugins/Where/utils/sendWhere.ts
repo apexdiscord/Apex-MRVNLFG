@@ -1,4 +1,4 @@
-import { Guild, Member, TextableChannel, VoiceChannel, ChannelInvite } from "eris";
+import { Guild, Member, TextableChannel, VoiceChannel } from "eris";
 import { getInviteLink } from "knub/dist/helpers";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { logger } from "../../../logger";

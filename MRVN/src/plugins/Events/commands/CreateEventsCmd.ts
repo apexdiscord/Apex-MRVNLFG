@@ -54,12 +54,13 @@ export const CreateEventCmd = eventsCommand({
       voiceChan = await pluginData.guild.createChannel(
         "" + ((await pluginData.state.guildEvents.highestEventId()) + 1),
         2,
-        "Create event vocie channel",
         {
+          reason: "Create event voice channel",
           parentID: cfg.voice_parent_id,
           permissionOverwrites: [
-            { type: "role", id: pluginData.guild.id, allow: 0, deny: everyoneDeny },
+            { type: "role", id: pluginData.guild.id, allow: 512, deny: everyoneDeny },
             { type: "role", id: cfg.organiser_role, allow: 1049600, deny: 0 },
+            { type: "role", id: cfg.moderator_role, allow: 22021120, deny: 0 },
             { type: "member", id: pluginData.client.user.id, allow: 269544528, deny: 0 },
           ],
         },
@@ -69,7 +70,12 @@ export const CreateEventCmd = eventsCommand({
       return;
     }
 
-    const announceMsg = await announceChan.createMessage({ embed });
+    const pingRole = cfg.ping_role;
+    let prefix = "";
+    if (pingRole !== "") {
+      prefix = `<@&${pingRole}> | A new event was just announced!`;
+    }
+    const announceMsg = await announceChan.createMessage({ content: prefix, embed });
     announceMsg.addReaction("👍");
 
     pluginData.state.guildEvents.add(
