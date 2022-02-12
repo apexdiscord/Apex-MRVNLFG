@@ -19,7 +19,7 @@
   "dependencies": {
     "@types/js-yaml": "^3.12.2",
     "@types/node": "^13.13.2",
-    "ajv": "^6.12.2",
+    "ajv": "^6.12.3",
     "bufferutil": "^4.0.1",
     "cross-env": "^7.0.2",
     "dotenv": "^8.2.0",
