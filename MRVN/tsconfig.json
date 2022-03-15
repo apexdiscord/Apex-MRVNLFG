@@ -5,20 +5,23 @@
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
-    "allowJs": true,
     "emitDecoratorMetadata": true,
-    "target": "esnext",
-    "lib": [
-      "es2017",
-      "esnext"
-    ],
-    "baseUrl": "./",
+    "target": "es2020",
+    "lib": ["esnext"],
+    "baseUrl": ".",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "outDir": "./dist",
-    "skipLibCheck": true 
+    "paths": {
+      "@shared/*": ["../shared/src/*"]
+    },
+    "sourceMap": true,
+    "alwaysStrict": true,
+    "noImplicitThis": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "allowJs": true
   },
-  "include": [
-    "src/**/*.ts"
-  ]
+  "include": ["src/**/*.ts", "ormconfig.js"]
 }
