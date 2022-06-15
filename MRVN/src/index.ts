@@ -13,6 +13,7 @@ import { startUptimeCount } from "./utils/utils";
 import { logger } from "./utils/logger";
 import { ModerationPlugin } from "./plugins/Moderation/ModerationPlugin";
 import { connect } from "./data/db";
+import { initializeSlashCommands } from "./slashCommands/initializeSlashCommands";
 
 require("dotenv").config({ path: path.resolve(process.cwd(), "bot.env") });
 
@@ -67,6 +68,7 @@ connect().then(async () => {
   logger.info("Bot Initialized");
   logger.info("Logging in...");
   await botClient.login(process.env.TOKEN);
+  await initializeSlashCommands(botClient.user!.id);
 
   loadRegex();
   startUptimeCount();

@@ -1,5 +1,4 @@
-import { Client, Guild, GuildMember, Snowflake, User } from "discord.js";
-import { logger } from "./logger";
+import * as t from "io-ts";
 
 const delayStringMultipliers: any = {
   w: 1000 * 60 * 60 * 24 * 7,
@@ -81,4 +80,8 @@ export function convertDelayStringToMS(str: string, defaultUnit: string = "m"): 
   }
 
   return ms;
+}
+
+export function tNullable<T extends t.Type<any, any>>(type: T) {
+  return t.union([type, t.undefined, t.null], `Nullable<${type.name}>`);
 }

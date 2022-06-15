@@ -1,4 +1,8 @@
 import { Settings } from "luxon";
+import { Block } from "./src/data/entities/Block";
+import { ActiveLFG } from "./src/data/entities/ActiveLFG";
+import { KickBlockCounter } from "./src/data/entities/KickBlockCounter";
+import { Modban } from "./src/data/entities/Modban";
 const fs = require("fs");
 const path = require("path");
 
@@ -11,9 +15,9 @@ try {
 
 Settings.defaultZone = "utc";
 
-const entities = path.relative(process.cwd(), path.resolve(__dirname, "dist/data/entities/*.js"));
-const migrations = path.relative(process.cwd(), path.resolve(__dirname, "dist/migrations/*.js"));
-const migrationsDir = path.relative(process.cwd(), path.resolve(__dirname, "src/migrations"));
+const entities = path.resolve(__dirname, "dist/src/data/entities/*.js").replaceAll("\\","\\\\");
+const migrations = path.resolve(__dirname, "dist/src/migrations/*.js").replaceAll("\\","\\\\");
+const migrationsDir = path.resolve(__dirname, "src/migrations").replaceAll("\\","\\\\");
 
 export default {
   type: "mysql",
@@ -31,7 +35,7 @@ export default {
   logging: ["error", "warn"],
 
   // Entities
-  entities: [entities],
+  entities: [entities, ActiveLFG, Block, KickBlockCounter, Modban],
 
   // Pool options
   extra: {

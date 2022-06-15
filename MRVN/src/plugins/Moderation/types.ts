@@ -8,5 +8,5 @@ export interface ModerationPluginType extends BasePluginType {
   config: TConfigSchema;
 }
 
-export const lfgCommand = typedGuildCommand<ModerationPluginType>();
-export const lfgEvent = typedGuildEventListener<ModerationPluginType>();
+export const moderationCommand = typedGuildCommand<ModerationPluginType>();
+export const moderationEvent = typedGuildEventListener<ModerationPluginType>();

@@ -1,0 +1,22 @@
+# Test Server
+
+prefix: '+'
+
+levels:
+  # Dark
+  "108552944961454080": 100
+  
+  # Moderator
+  "982686242275754004": 50
+
+plugins:
+
+  apex_events: {}
+  where: {}
+  utility: {}
+  
+  lfg: 
+    config:
+      hubVoice: "982686445082914897"
+      alertText: "983183767625678858"
+      logText: "983183856196812850"

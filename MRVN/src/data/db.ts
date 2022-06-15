@@ -16,7 +16,7 @@ export function connect() {
     }).then((newConnection) => {
       // Verify the DB timezone is set to UTC
       return newConnection.query("SELECT TIMEDIFF(NOW(), UTC_TIMESTAMP) AS tz").then((r) => {
-        if (r[0].tz !== "01:00:00") {
+        if (r[0].tz !== "00:00:00") {
           throw new SimpleError(`Database timezone must be UTC (detected ${r[0].tz})`);
         }
 
