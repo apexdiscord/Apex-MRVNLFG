@@ -33,12 +33,7 @@ export const lfgKickSlashCommandListener = lfgEvent({
       if (vMember.id === initiatorId) continue;
       if (getMemberLevel(meta.pluginData, vMember) >= 50) continue;
 
-      dropDown.addOptions([
-        new SelectMenuOptionBuilder()
-          .setLabel(vMember.displayName)
-          .setValue(vMember.id)
-          .toJSON(),
-      ]);
+      dropDown.addOptions([new SelectMenuOptionBuilder().setLabel(vMember.displayName).setValue(vMember.id).toJSON()]);
     }
 
     if (dropDown.options.length === 0) {
