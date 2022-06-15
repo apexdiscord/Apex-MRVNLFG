@@ -31,9 +31,7 @@ const legends = [
   "Ash",
   "Mad Maggie",
   "Newcastle",
-  "Nessie",
 ];
-// Don't forget to re-add Nessie!
 
 const guns = [
   "Alternator",
@@ -158,4 +156,8 @@ const dropsWE = [
   "Climatizer",
 ];
 
-const pool = [...legends, ...guns, ...dropsKC, ...dropsOL, ...dropsSP, ...dropsWE];
+const special = [
+  "Nessie",
+]
+
+const pool = [...legends, ...guns, ...dropsKC, ...dropsOL, ...dropsSP, ...dropsWE, ...special];
