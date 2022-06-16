@@ -158,6 +158,19 @@ const dropsWE = [
 
 const special = [
   "Nessie",
+  "Newt",
+  "D.O.C.",
+  "Sheila",
+  "Artur",
+  "Porkchops",
+  "Death Box",
+  "Forge",
+  "MRVN",
+  "Kuben Blisk",
+  "Jack Cooper",
+  "BT-7274",
+  "Viper",
+  "Tilted Towers",
 ]
 
 const pool = [...legends, ...guns, ...dropsKC, ...dropsOL, ...dropsSP, ...dropsWE, ...special];
