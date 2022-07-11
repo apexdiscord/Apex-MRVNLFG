@@ -5,11 +5,11 @@ const fsp = fs.promises;
 
 let blockedRegex: string[] = ["f[a@]gg[o0]t", "ch[i1l]nk", "n[il1](gg|bb)(er|a|@)?", "r[e3]t[a4@]rd"];
 
-export function passesFilter(message: string): boolean {
+export function passesFilter(message: string): boolean | string {
   for (const element of blockedRegex) {
     const filter: RegExp = new RegExp(element, "i");
     if (!(message.match(filter) == null)) {
-      return false;
+      return element;
     }
   }
 

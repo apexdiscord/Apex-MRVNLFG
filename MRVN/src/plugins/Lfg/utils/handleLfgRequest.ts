@@ -22,8 +22,9 @@ export async function handleLfgRequest(
     member = await pluginData.guild.members.fetch({ force: true, withPresences: false, user: member });
   }
 
-  if (!passesFilter(message)) {
-    await logBannedWord(member.id, message, pluginData);
+  const filtered = passesFilter(message);
+  if (filtered !== true) {
+    await logBannedWord(member.id, message, filtered as string, pluginData);
     return "Your message contains a banned word. This incident will be reported.";
   }
 
@@ -58,14 +59,21 @@ export async function handleLfgRequest(
   } */
 
   const fetched = await pluginData.guild.channels.fetch(member.voice.channelId) as VoiceChannel;
+  if (fetched.id === pluginData.state.hubVoice.id) {
+    logger.info(
+      `${member.id.slice(0, -3) + `XXX`} failed to create a LFG post because they are in the hub vc`,
+    );
+    return `You must be in a LFG Voice Channel to create LFG posts!`;
+  }
+
   const activeLfg = await pluginData.state.activeLfgs.findForVoice(member.voice.channelId);
 
   if (activeLfg) {
     const lastEdited = DateTime.fromMillis(parseInt(activeLfg.created_at, 10));
     const secondDiff = DateTime.now().diff(lastEdited, "seconds").seconds;
     if (secondDiff < 30) {
-      logger.info(`${member.id} failed to create a LFG post because the 30 second cooldown has not expired (${30 - secondDiff})`);
-      return `You can only create one LFG post per 30 seconds per channel. Please wait ${(30 - secondDiff).toString().substring(0, 2)} seconds.`;
+      logger.info(`${member.id.slice(0, -3) + `XXX`} failed to create a LFG post because the 30 second cooldown has not expired (${30 - secondDiff}, ${fetched.name})`);
+      return `You can only create one LFG post per 30 seconds per channel. Please wait ${Math.floor((30 - secondDiff))} seconds.`;
     }
 
     const oldMessageText = await pluginData.guild.channels.fetch(activeLfg.text_channel_id) as TextChannel;
@@ -103,7 +111,7 @@ export async function handleLfgRequest(
   });
 
   await pluginData.state.activeLfgs.claim(fetched.id, postedMsg.channelId, postedMsg.id, member.id);
-  logger.info(`${member.id.slice(0, -3) + `XXX`} successfully created a LFG post (vc claimed)`);
+  logger.info(`${member.id.slice(0, -3) + `XXX`} successfully created a LFG post for ${fetched.id} (${fetched.name})`);
 
   return "Successfully created LFG post!";
 }

@@ -4,7 +4,7 @@ import { Routes } from "discord-api-types/v9";
 import { logger } from "../utils/logger";
 import { lfgCreateSlashCommand } from "./lfgCreate";
 import { lfgCancelSlashCommand } from "./lfgCancel";
-import { lfgBlockSlashCommand } from "./lfgblock";
+import { lfgBlockSlashCommand } from "./lfgBlock";
 import { lfgUnblockSlashCommand } from "./lfgUnblock";
 import { lfgBlocklistSlashCommand } from "./lfgBlocklist";
 import { lfgKickSlashCommand } from "./lfgKick";

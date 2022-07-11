@@ -41,9 +41,9 @@ export const LfgPlugin = typedGuildPlugin<LfgPluginType>()({
   events: [
     lfgCreateSlashCommandListener,
     lfgCancelSlashCommandListener,
-    lfgBlockSlashCommandListener,
-    lfgUnblockSlashCommandListener,
-    lfgBlocklistSlashCommandListener,
+    // lfgBlockSlashCommandListener,
+    // lfgUnblockSlashCommandListener,
+    // lfgBlocklistSlashCommandListener,
     lfgKickSlashCommandListener,
     lfgKickSelectionCommandListener,
     lfgButtonJoinCommandListener,

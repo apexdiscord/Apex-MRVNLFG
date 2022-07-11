@@ -19,9 +19,9 @@ export async function logUnblock(initiatorId: string, targetId: string, pluginDa
   logger.info(`${initiatorId.slice(0, -3) + `XXX`} unblocked ${targetId.slice(0, -3) + `XXX`}`);
 }
 
-export async function logBannedWord(initiatorId: string, message: string, pluginData: GuildPluginData<LfgPluginType>) {
+export async function logBannedWord(initiatorId: string, message: string, filtered: string, pluginData: GuildPluginData<LfgPluginType>) {
   await pluginData.state.alertText.send({
-    content: `⚠️ <@${initiatorId}> (${initiatorId}) tried to create LFG with a banned word: \`${message}\``,
+    content: `⚠️ <@${initiatorId}> (${initiatorId}) tried to create LFG with a banned word \`${filtered}\`: \`${message}\``,
     allowedMentions: { users: [] },
   });
   logger.warn(`${initiatorId} tried to create LFG with a banned word: ${message}`);
