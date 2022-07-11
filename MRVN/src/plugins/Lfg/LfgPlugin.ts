@@ -89,7 +89,7 @@ export const LfgPlugin = typedGuildPlugin<LfgPluginType>()({
     pluginData.state.kickBlockCounter = new GuildKickBlockCounter(pluginData.guild.id);
     pluginData.state.modbans = new GuildModbans(pluginData.guild.id);
 
-    pluginData.state.lfgCats = ["982695326873956362", "983129874963234816", "983129908769337444", "986352001770213406"];
+    pluginData.state.lfgCats = ["995998211946852352", "995998225431535656", "995998239281119252"];
     pluginData.state.lfgCatAmt = [];
     for (let i = 0; i < pluginData.state.lfgCats.length; i++) {
       pluginData.state.lfgCatAmt[i] = (

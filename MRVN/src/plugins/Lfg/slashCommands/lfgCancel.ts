@@ -22,16 +22,16 @@ export const lfgCancelSlashCommandListener = lfgEvent({
     }
 
     try {
-      const vChannel = (await meta.pluginData.guild.channels.fetch(activeLfg.voice_channel_id)) as VoiceChannel;
-      await vChannel.delete();
+      // const vChannel = (await meta.pluginData.guild.channels.fetch(activeLfg.voice_channel_id)) as VoiceChannel;
+      // await vChannel.delete();
       await meta.pluginData.state.activeLfgs.removeForVoiceAndUser(activeLfg.voice_channel_id, userId);
 
-      for (let i = 0; i < meta.pluginData.state.lfgCats.length; i++) {
+      /* for (let i = 0; i < meta.pluginData.state.lfgCats.length; i++) {
         if (meta.pluginData.state.lfgCats[i] === vChannel.parentId) {
           meta.pluginData.state.lfgCatAmt[i] = meta.pluginData.state.lfgCatAmt[i] - 1;
           break;
         }
-      }
+      } */
     } catch (e) {
       await interaction.editReply("Encoutered an error while canceling your LFG request.\nPlease message ModMail");
       logger.error(e);

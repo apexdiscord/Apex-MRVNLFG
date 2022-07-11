@@ -171,6 +171,6 @@ const special = [
   "BT-7274",
   "Viper",
   "Tilted Towers",
-]
+];
 
 const pool = [...legends, ...guns, ...dropsKC, ...dropsOL, ...dropsSP, ...dropsWE, ...special];

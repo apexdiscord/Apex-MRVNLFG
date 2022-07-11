@@ -9,15 +9,16 @@ import { lfgUnblockSlashCommand } from "./lfgUnblock";
 import { lfgBlocklistSlashCommand } from "./lfgBlocklist";
 import { lfgKickSlashCommand } from "./lfgKick";
 import { lfgModbanSlashCommand } from "./lfgModban";
+import { lfgTestRC } from "./lfgTestRC";
 
 export async function initializeSlashCommands(clientId: Snowflake) {
   // Grab all slash commands
   const commands = [
     lfgCreateSlashCommand,
     lfgCancelSlashCommand,
-    lfgBlockSlashCommand,
-    lfgUnblockSlashCommand,
-    lfgBlocklistSlashCommand,
+    // lfgBlockSlashCommand,
+    // lfgUnblockSlashCommand,
+    // lfgBlocklistSlashCommand,
     lfgKickSlashCommand,
     lfgModbanSlashCommand,
   ];
@@ -27,9 +28,9 @@ export async function initializeSlashCommands(clientId: Snowflake) {
   logger.info(`Initializing ${commands.length} slash commands`);
 
   try {
-    await rest.put(Routes.applicationGuildCommands(clientId, "982685948921925742"), { body: commands });
+    await rest.put(Routes.applicationGuildCommands(clientId, "995996228359827456"), { body: commands });
   } catch (e: any) {
-    logger.error(`Failed to initialize slash commands: ${e.message}`);
+    logger.error(`Failed to initialize slash commands: ${e}`);
   }
 
   logger.info("Slash commands initialized");

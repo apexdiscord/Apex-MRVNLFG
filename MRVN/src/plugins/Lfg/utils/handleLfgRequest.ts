@@ -1,11 +1,12 @@
-import { GuildMember, MessageActionRow, MessagePayload, Snowflake, TextChannel, VoiceChannel } from "discord.js";
+import { CategoryChannel, GuildMember, MessageActionRow, Snowflake, TextChannel, VoiceChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { ButtonBuilder, EmbedBuilder } from "@discordjs/builders";
 import { ButtonStyle, ComponentType } from "discord-api-types/v10";
+import { DateTime } from "luxon";
+import { noop } from "knub/dist/utils";
 import { logger } from "../../../utils/logger";
 import { passesFilter } from "../../../utils/blockedWords";
 import { LfgPluginType } from "../types";
-import { getRandomChannelName } from "./getChannelName";
 import { logBannedWord } from "./userActionLogger";
 
 export async function handleLfgRequest(
@@ -39,10 +40,10 @@ export async function handleLfgRequest(
     logger.info(
       `${member.id.slice(0, -3) + `XXX`} failed to create a LFG post because they are not in any voice channel`,
     );
-    return `You must be in <#${pluginData.state.hubVoice.id}> to create LFG posts!`;
+    return `You must be in a LFG voice channel to create LFG posts!`;
   }
 
-  let claimVoice: string | null = null;
+  /* let claimVoice: string | null = null;
   if (member.voice?.channelId !== pluginData.state.hubVoice.id) {
     const activeLfg = await pluginData.state.activeLfgs.findForVoice(member.voice.channelId);
     if (activeLfg?.claimable) {
@@ -50,48 +51,36 @@ export async function handleLfgRequest(
       claimVoice = activeLfg.voice_channel_id;
     } else {
       logger.info(
-        `${member.id.slice(0, -3) + `XXX`} failed to create a LFG post because they are not in the hub voice channel`,
+        `${member.id.slice(0, -3) + `XXX`} failed to create a LFG post because they are not in a vc`,
       );
       return `You must be in <#${pluginData.state.hubVoice.id}> to create LFG posts!`;
     }
-  }
+  } */
 
-  let created: VoiceChannel | null = null;
-  try {
-    if (claimVoice == null) {
-      for (let i = 0; i < pluginData.state.lfgCats.length; i++) {
-        const amt = pluginData.state.lfgCatAmt[i];
-        if (amt >= pluginData.state.lfgCatLimit) {
-          continue;
-        }
+  const fetched = await pluginData.guild.channels.fetch(member.voice.channelId) as VoiceChannel;
+  const activeLfg = await pluginData.state.activeLfgs.findForVoice(member.voice.channelId);
 
-        created = await pluginData.guild.channels.create(getRandomChannelName(), {
-          parent: pluginData.state.lfgCats[i],
-          type: "GUILD_VOICE",
-          userLimit: limit,
-          reason: "LFG request",
-        });
-        pluginData.state.lfgCatAmt[i] = pluginData.state.lfgCatAmt[i] + 1;
-        await member.edit({ channel: created.id }, "LFG Request");
-        break;
-      }
-
-      if (!created) {
-        logger.warn(`${member.id.slice(0, -3) + `XXX`} failed to create a LFG post because all categories are full`);
-        return "Sorry, all LFG categories are currently full.\nPlease message ModMail.";
-      }
-    } else {
-      created = (await pluginData.guild.channels.fetch(claimVoice)) as VoiceChannel;
-      if (created == null) {
-        logger.error("Failed to fetch voice channel for LFG claim request, ID: " + claimVoice);
-        return "Unspecified error claiming LFG channel.\nPlease message ModMail.";
-      }
+  if (activeLfg) {
+    const lastEdited = DateTime.fromMillis(parseInt(activeLfg.created_at, 10));
+    const secondDiff = DateTime.now().diff(lastEdited, "seconds").seconds;
+    if (secondDiff < 60) {
+      logger.info(`${member.id} failed to create a LFG post because the 60 second cooldown has not expired (${60 - secondDiff})`);
+      return `You can only create one LFG post a minute per channel. Pleas wait ${60 - secondDiff} seconds.`;
     }
-  } catch (e) {
-    logger.error(e);
-    return `Failed to create LFG channel or move you: \`${e}\`.\nPlease message ModMail.`;
+
+    const oldMessageText = await pluginData.guild.channels.fetch(activeLfg.text_channel_id) as TextChannel;
+    const oldMessage = await oldMessageText.messages.fetch(activeLfg.message_id).catch(noop);
+    if (oldMessage) oldMessage.delete().catch(noop);
   }
 
+  if (fetched.members.size >= limit) {
+    return `You cannot create a LFG post because your channel is or would be full.`;
+  }
+
+  if (fetched.userLimit !== limit) {
+    await fetched.edit( {userLimit: limit} );
+  }
+  
   const embed = new EmbedBuilder({
     title: `${member.displayName} is looking for a group!`,
     color: member.displayColor,
@@ -101,12 +90,10 @@ export async function handleLfgRequest(
   });
 
   const button = new ButtonBuilder({
-    style: ButtonStyle.Success,
+    style: ButtonStyle.Link,
     emoji: { name: "🔊" },
     label: `Join ${member.displayName}'s group`,
-    custom_id: `lfg::join::${member.id}::${created.id}`,
-    type: ComponentType.Button,
-    disabled: false,
+    url: `https://discord.com/channels/${pluginData.guild.id}/${fetched.id}`,
   }).toJSON();
 
   const postedMsg = await ((await pluginData.guild.channels.fetch(channel, { cache: true })) as TextChannel).send({
@@ -114,13 +101,8 @@ export async function handleLfgRequest(
     components: [new MessageActionRow().addComponents(button)],
   });
 
-  if (claimVoice == null) {
-    await pluginData.state.activeLfgs.add(created.id, postedMsg.channelId, postedMsg.id, member.id);
-    logger.info(`${member.id.slice(0, -3) + `XXX`} successfully created a LFG post (new vc created)`);
-  } else {
-    await pluginData.state.activeLfgs.claim(created.id, postedMsg.channelId, postedMsg.id, member.id);
-    logger.info(`${member.id.slice(0, -3) + `XXX`} successfully created a LFG post (old vc claimed)`);
-  }
+  await pluginData.state.activeLfgs.claim(fetched.id, postedMsg.channelId, postedMsg.id, member.id);
+  logger.info(`${member.id.slice(0, -3) + `XXX`} successfully created a LFG post (vc claimed)`);
 
   return "Successfully created LFG post!";
 }

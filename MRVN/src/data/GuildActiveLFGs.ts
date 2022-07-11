@@ -19,6 +19,7 @@ export class GuildActiveLFGs extends BaseGuildRepository {
       text_channel_id: textChannelId,
       message_id: messageId,
       user_id: userId,
+      claimable: true,
       created_at: DateTime.now().toMillis().toString(),
     });
   }
@@ -61,18 +62,35 @@ export class GuildActiveLFGs extends BaseGuildRepository {
   }
 
   async claim(voiceChannelId: string, newChannelId: string, newMessageId: string, newUserId: string) {
-    await this.activeLfgs.update(
-      {
+    const exists = await this.activeLfgs.findOne({
+      guild_id: this.guildId,
+      voice_channel_id: voiceChannelId,
+    });
+    if (exists) {
+      await this.activeLfgs.update(
+        {
+          guild_id: this.guildId,
+          voice_channel_id: voiceChannelId,
+        },
+        {
+          user_id: newUserId,
+          text_channel_id: newChannelId,
+          message_id: newMessageId,
+          claimable: true,
+          created_at: DateTime.now().toMillis().toString(),
+        },
+      );
+    } else {
+      await this.activeLfgs.insert({
         guild_id: this.guildId,
         voice_channel_id: voiceChannelId,
-      },
-      {
         user_id: newUserId,
         text_channel_id: newChannelId,
         message_id: newMessageId,
-        claimable: false,
-      },
-    );
+        claimable: true,
+        created_at: DateTime.now().toMillis().toString(),
+      });
+    }
   }
 
   async setEnabled(voiceChannelId: string, userId: string, enabled: boolean) {
@@ -93,7 +111,7 @@ export class GuildActiveLFGs extends BaseGuildRepository {
         voice_channel_id: voiceChannelId,
         user_id: userId,
       },
-      { claimable },
+      { claimable: true },
     );
   }
 
