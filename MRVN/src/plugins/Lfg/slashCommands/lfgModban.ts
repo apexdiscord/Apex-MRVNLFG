@@ -9,7 +9,7 @@ export const lfgModbanSlashCommandListener = lfgEvent({
   async listener(meta) {
     const interaction = meta.args.interaction.isCommand() ? meta.args.interaction : null;
     if (!interaction || !interaction.isCommand) return;
-    if (interaction.commandName !== "lfgban") return;
+    if (!interaction.commandName.startsWith("lfgban")) return;
 
     await interaction.deferReply({ ephemeral: true });
 

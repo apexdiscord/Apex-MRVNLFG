@@ -9,7 +9,6 @@ import { lfgUnblockSlashCommand } from "./lfgUnblock";
 import { lfgBlocklistSlashCommand } from "./lfgBlocklist";
 import { lfgKickSlashCommand } from "./lfgKick";
 import { lfgModbanSlashCommand } from "./lfgModban";
-import { lfgTestRC } from "./lfgTestRC";
 
 export async function initializeSlashCommands(clientId: Snowflake) {
   // Grab all slash commands

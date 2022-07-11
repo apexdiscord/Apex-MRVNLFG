@@ -63,9 +63,9 @@ export async function handleLfgRequest(
   if (activeLfg) {
     const lastEdited = DateTime.fromMillis(parseInt(activeLfg.created_at, 10));
     const secondDiff = DateTime.now().diff(lastEdited, "seconds").seconds;
-    if (secondDiff < 60) {
-      logger.info(`${member.id} failed to create a LFG post because the 60 second cooldown has not expired (${60 - secondDiff})`);
-      return `You can only create one LFG post a minute per channel. Pleas wait ${60 - secondDiff} seconds.`;
+    if (secondDiff < 30) {
+      logger.info(`${member.id} failed to create a LFG post because the 30 second cooldown has not expired (${30 - secondDiff})`);
+      return `You can only create one LFG post per 30 seconds per channel. Please wait ${(30 - secondDiff).toString().substring(0, 2)} seconds.`;
     }
 
     const oldMessageText = await pluginData.guild.channels.fetch(activeLfg.text_channel_id) as TextChannel;
@@ -89,11 +89,12 @@ export async function handleLfgRequest(
     fields: [{ name: "Message", value: message, inline: false }],
   });
 
+  const invite = await createOrReuseInvite(fetched, pluginData);
   const button = new ButtonBuilder({
     style: ButtonStyle.Link,
     emoji: { name: "🔊" },
     label: `Join ${member.displayName}'s group`,
-    url: `https://discord.com/channels/${pluginData.guild.id}/${fetched.id}`,
+    url: invite.url,
   }).toJSON();
 
   const postedMsg = await ((await pluginData.guild.channels.fetch(channel, { cache: true })) as TextChannel).send({
@@ -114,3 +115,7 @@ export async function runLFGCleanupLoop(pluginData: GuildPluginData<LfgPluginTyp
 
   setTimeout(() => runLFGCleanupLoop(pluginData), LFG_CLEANUP_LOOP_INTERVAL);
 }
+async function createOrReuseInvite(vChannel: VoiceChannel, pluginData: GuildPluginData<LfgPluginType>) {
+  return vChannel.createInvite({ maxAge: 0, reason: "LFG Request" });
+}
+

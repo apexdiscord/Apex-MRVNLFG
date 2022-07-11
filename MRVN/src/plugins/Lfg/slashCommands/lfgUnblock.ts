@@ -7,7 +7,7 @@ export const lfgUnblockSlashCommandListener = lfgEvent({
   async listener(meta) {
     const interaction = meta.args.interaction.isCommand() ? meta.args.interaction : null;
     if (!interaction || !interaction.isCommand) return;
-    if (interaction.commandName !== "unblock") return;
+    if (!interaction.commandName.startsWith("unblock")) return;
 
     await interaction.deferReply({ ephemeral: true });
 

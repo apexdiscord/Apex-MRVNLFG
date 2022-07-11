@@ -1,4 +1,5 @@
 import { TextChannel, VoiceChannel } from "discord.js";
+import { noop } from "knub/dist/utils";
 import { logger } from "../../../utils/logger";
 import { lfgEvent } from "../types";
 
@@ -142,7 +143,7 @@ export const lfgButtonJoinCommandListener = lfgEvent({
       }
     }
 
-    await interaction.reply({ ephemeral: true, content: "Successfully joined, GLHF!" });
+    await interaction.reply({ ephemeral: true, content: "Successfully joined, GLHF!" }).catch(noop);
     logger.info(`${presser.id.slice(0, -3) + `XXX`} successfully joined LFG`);
   },
 });

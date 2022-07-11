@@ -6,7 +6,7 @@ export const lfgBlocklistSlashCommandListener = lfgEvent({
   async listener(meta) {
     const interaction = meta.args.interaction.isCommand() ? meta.args.interaction : null;
     if (!interaction || !interaction.isCommand) return;
-    if (interaction.commandName !== "blocklist") return;
+    if (!interaction.commandName.startsWith("blocklist")) return;
 
     await interaction.deferReply({ ephemeral: true });
 

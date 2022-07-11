@@ -8,7 +8,7 @@ export const lfgCreateSlashCommandListener = lfgEvent({
   async listener(meta) {
     const interaction = meta.args.interaction.isCommand() ? meta.args.interaction : null;
     if (!interaction || !interaction.isCommand) return;
-    if (interaction.commandName !== "lfg") return;
+    if (!interaction.commandName.startsWith("lfg")) return;
 
     await interaction.deferReply({ ephemeral: true });
 
