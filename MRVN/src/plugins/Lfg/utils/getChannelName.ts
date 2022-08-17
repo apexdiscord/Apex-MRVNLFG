@@ -31,6 +31,7 @@ const legends = [
   "Ash",
   "Mad Maggie",
   "Newcastle",
+  "Vantage",
 ];
 
 const guns = [
@@ -65,27 +66,27 @@ const guns = [
 ];
 
 const dropsKC = [
-  "Gauntlet (Octane Town Takeover)",
-  "Airbase",
-  "Runoff",
-  "The Pit",
   "Spotted Lake",
-  "Containment",
-  "Crash Site",
-  "Artillery",
-  "Broken Relay",
-  "The Rig",
-  "Capacitor",
-  "Labs (Wraith Town Takeover)",
-  "The Cage",
-  "Bunker",
-  "Salvage",
-  "Market",
-  "Caustic Treatment (Caustic Town Takeover)",
-  "Repulsor",
-  "Hydro Dam",
-  "Swamps",
-  "Map Room (Crypto Town Takeover)",
+	"Runoff",
+	"Airbase",
+	"Gauntlet (Octane Town Takeover)",
+	"The Pit",
+	"Bunker",
+	"Relic",
+	"Market",
+	"Caustic Treatment (Caustic Town Takeover)",
+	"Map Room (Crypto Town Takeover)",
+	"Repulsor",
+	"Hydro Dam",
+	"The Cage",
+	"Containment",
+	"Crash Site",
+	"Artillery",
+	"Labs (Wraith Town Takeover)",
+	"Swamps",
+	"Capacitor",
+	"The Rig",
+	"Basin",
 ];
 
 const dropsOL = [
